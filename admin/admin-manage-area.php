@@ -76,8 +76,8 @@ if (isset($_GET['del'])) {
                                         <tr>
                                             <td><?php echo $cnt; ?></td>
                                             <td><?php echo $row->parkingID; ?></td>
+                                            <td><?php echo $row->parkingArea; ?></td>
                                             <td><?php echo $row->parkingType; ?></td>
-                                            <td><?php echo $row->vehicleType; ?></td>
                                             <td><?php echo $row->parkingAvailabilityStatus; ?></td>
                                             <td>
                                                 <a href="admin-edit-park.php?u_id=<?php echo $row->parkingID; ?>" class="badge bg-success text-white"><i class="fas fa-user-edit"></i> Update</a>

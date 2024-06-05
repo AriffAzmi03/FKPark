@@ -33,13 +33,13 @@ if (isset($_GET['u_id'])) {
 // Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_parking'])) {
     // Get form data
-    $vehicleType = $_POST['vehicleType'];
+    $parkingType = $_POST['parkingType'];
     $parkingAvailabilityStatus = $_POST['parkingAvailabilityStatus'];
 
     // Prepare and execute the update query
-    $query = "UPDATE parkingspace SET vehicleType = ?, parkingAvailabilityStatus = ? WHERE parkingID = ?";
+    $query = "UPDATE parkingspace SET parkingType = ?, parkingAvailabilityStatus = ? WHERE parkingID = ?";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("sss", $vehicleType, $parkingAvailabilityStatus, $parkingID);
+    $stmt->bind_param("sss", $parkingType, $parkingAvailabilityStatus, $parkingID);
 
     if ($stmt->execute()) {
         echo "<div class='alert alert-success' role='alert'>Parking space updated successfully!</div>";
@@ -78,16 +78,16 @@ $conn->close();
                             <input type="text" class="form-control" id="parkingID" name="parkingID" value="<?php echo $parking['parkingID']; ?>" disabled>
                         </div>
                         <div class="form-group mb-3">
-                            <label for="parkingType">Parking Area</label>
-                            <input type="text" class="form-control" id="parkingType" name="parkingType" value="<?php echo $parking['parkingType']; ?>" disabled>
+                            <label for="pparkingArea">Parking Area</label>
+                            <input type="text" class="form-control" id="parkingArea" name="parkingArea" value="<?php echo $parking['parkingArea']; ?>" disabled>
                         </div>
                         <div class="form-group mb-3">
-                            <label for="vehicleType">Type of Vehicle</label>
-                            <select class="form-control" id="vehicleType" name="vehicleType" required>
-                                <option value="None" <?php if ($parking['vehicleType'] == 'None') echo 'selected'; ?>>None</option>
-                                <option value="Car" <?php if ($parking['vehicleType'] == 'Car') echo 'selected'; ?>>Car</option>
-                                <option value="Motorcycle" <?php if ($parking['vehicleType'] == 'Motorcycle') echo 'selected'; ?>>Motorcycle</option>
-                                <option value="Others" <?php if ($parking['vehicleType'] == 'Others') echo 'selected'; ?>>Others</option>
+                            <label for="parkingType">Type of Vehicle</label>
+                            <select class="form-control" id="parkingType" name="parkingType" required>
+                                <option value="None" <?php if ($parking['parkingType'] == 'None') echo 'selected'; ?>>None</option>
+                                <option value="Car" <?php if ($parking['parkingType'] == 'Car') echo 'selected'; ?>>Car</option>
+                                <option value="Motorcycle" <?php if ($parking['parkingType'] == 'Motorcycle') echo 'selected'; ?>>Motorcycle</option>
+                                <option value="Others" <?php if ($parking['parkingType'] == 'Others') echo 'selected'; ?>>Others</option>
                             </select>
                         </div>
                         <div class="form-group mb-3">

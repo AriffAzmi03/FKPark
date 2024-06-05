@@ -52,8 +52,8 @@ include('includes/dbconnection.php');
                                         <tr>
                                             <td><?php echo $cnt; ?></td>
                                             <td><?php echo $row->parkingID; ?></td>
+                                            <td><?php echo $row->parkingArea; ?></td>
                                             <td><?php echo $row->parkingType; ?></td>
-                                            <td><?php echo $row->vehicleType; ?></td>
                                             <td><?php echo $row->parkingAvailabilityStatus; ?></td>
                                         </tr>
                                     <?php

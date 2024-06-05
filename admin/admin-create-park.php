@@ -9,15 +9,15 @@ include('includes/dbconnection.php');
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_parking_space'])) {
     // Get form data
     $parkingID = $_POST['parkingID'];
+    $parkingArea = $_POST['parkingArea'];
     $parkingType = $_POST['parkingType'];
-    $vehicleType = $_POST['vehicleType'];
     $parkingAvailabilityStatus = $_POST['parkingAvailabilityStatus'];
 
     // Prepare and execute the insert query
-    $query = "INSERT INTO parkingspace (parkingID, parkingType, vehicleType, parkingAvailabilityStatus)
+    $query = "INSERT INTO parkingspace (parkingID, parkingArea, parkingType, parkingAvailabilityStatus)
               VALUES (?, ?, ?, ?)";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("ssss", $parkingID, $parkingType, $vehicleType, $parkingAvailabilityStatus);
+    $stmt->bind_param("ssss", $parkingID, $parkingArea, $parkingType, $parkingAvailabilityStatus);
 
     if ($stmt->execute()) {
         echo "<div class='alert alert-success' role='alert'>New parking space added successfully!</div>";
@@ -56,15 +56,15 @@ $conn->close();
                             <input type="text" required class="form-control" id="parkingID" name="parkingID">
                         </div>
                         <div class="form-group mb-3">
-                            <label for="parkingType">Parking Area</label>
-                            <select class="form-control" id="parkingType" name="parkingType" required>
+                            <label for="parkingArea">Parking Area</label>
+                            <select class="form-control" id="parkingArea" name="parkingArea" required>
                                 <option value="A">A</option>
                                 <option value="B">B</option>
                             </select>
                         </div>
                         <div class="form-group mb-3">
-                            <label for="vehicleType">Vehicle Type</label>
-                            <select class="form-control" id="vehicleType" name="vehicleType" required>
+                            <label for="parkingType">Vehicle Type</label>
+                            <select class="form-control" id="parkingType" name="parkingType" required>
                                 <option value="None">None</option>
                                 <option value="Car">Car</option>
                                 <option value="Motorcycle">Motorcycle</option>
