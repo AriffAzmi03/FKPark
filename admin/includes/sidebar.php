@@ -48,7 +48,7 @@
                 <div class="collapse" id="collapseParking" aria-labelledby="headingParking" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
                         <a class="nav-link" href="admin-create-park.php">Manage Parking Space</a>
-                        <a class="nav-link" href="admin-manage-orders.php">Manage Parking Area</a>
+                        <a class="nav-link" href="admin-manage-area.php">Manage Parking Area</a>
                     </nav>
                 </div>
 
