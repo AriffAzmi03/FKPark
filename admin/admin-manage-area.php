@@ -4,6 +4,25 @@ include('includes/header.php');
 
 // Include database connection file
 include('includes/dbconnection.php');
+
+// Handle deletion request
+if (isset($_GET['del'])) {
+    $parkingID = $_GET['del'];
+
+    // Prepare and execute the delete query
+    $query = "DELETE FROM parkingspace WHERE parkingID = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("s", $parkingID);
+
+    if ($stmt->execute()) {
+        echo "<div class='alert alert-success' role='alert'>Parking space deleted successfully!</div>";
+    } else {
+        echo "<div class='alert alert-danger' role='alert'>Error: " . $stmt->error . "</div>";
+    }
+
+    // Close the statement
+    $stmt->close();
+}
 ?>
 
 <div id="content-wrapper">
