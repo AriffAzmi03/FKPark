@@ -5,17 +5,15 @@ include('includes/header.php');
 // Include database connection file
 include('includes/dbconnection.php');
 
-// Handle deletion request
+// Handle delete request
 if (isset($_GET['del'])) {
     $parkingID = $_GET['del'];
-
-    // Prepare and execute the delete query
-    $query = "DELETE FROM parkingspace WHERE parkingID = ?";
-    $stmt = $conn->prepare($query);
+    $delQuery = "DELETE FROM parkingspace WHERE parkingID = ?";
+    $stmt = $conn->prepare($delQuery);
     $stmt->bind_param("s", $parkingID);
-
+    
     if ($stmt->execute()) {
-        $deleteMessage = "<div class='alert alert-success' role='alert'>User deleted successfully!</div>";
+        $deleteMessage = "<div class='alert alert-success' role='alert'>Parking space deleted successfully!</div>";
     } else {
         $deleteMessage = "<div class='alert alert-danger' role='alert'>Error: " . $stmt->error . "</div>";
     }
@@ -48,14 +46,20 @@ if (isset($_GET['del'])) {
                         Parking Spaces
                     </div>
                     <div class="card-body">
+                        <?php
+                        // Display delete message if set
+                        if (isset($deleteMessage)) {
+                            echo $deleteMessage;
+                        }
+                        ?>
                         <div class="table-responsive">
                             <table class="table table-bordered table-hover table-striped" id="dataTable" width="100%" cellspacing="0">
                                 <thead>
                                     <tr>
                                         <th style="width: 5%;">#</th>
-                                        <th style="width: 25%;">Parking Space Name</th>
+                                        <th style="width: 20%;">Parking Space Name</th>
                                         <th style="width: 20%;">Parking Area</th>
-                                        <th style="width: 25%;">Vehicle Type</th>
+                                        <th style="width: 20%;">Vehicle Type</th>
                                         <th style="width: 15%;">Availability</th>
                                         <th style="width: 10%;">Action</th>
                                     </tr>
@@ -76,7 +80,7 @@ if (isset($_GET['del'])) {
                                             <td><?php echo $row->vehicleType; ?></td>
                                             <td><?php echo $row->parkingAvailabilityStatus; ?></td>
                                             <td>
-                                            <a href="admin-edit-park.php?u_id=<?php echo $row->parkingID; ?>" class="badge bg-success text-white"><i class="fas fa-user-edit"></i> Update</a>
+                                                <a href="admin-edit-park.php?u_id=<?php echo $row->parkingID; ?>" class="badge bg-success text-white"><i class="fas fa-user-edit"></i> Update</a>
                                                 <a href="admin-manage-area.php?del=<?php echo $row->parkingID; ?>" class="badge bg-danger text-white" onclick="return confirm('Are you sure you want to delete this parking space?');"><i class="fas fa-trash-alt"></i> Delete</a>
                                             </td>
                                         </tr>
