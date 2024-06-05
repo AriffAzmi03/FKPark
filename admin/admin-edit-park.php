@@ -83,13 +83,18 @@ $conn->close();
                         </div>
                         <div class="form-group mb-3">
                             <label for="vehicleType">Type of Vehicle</label>
-                            <input type="text" required class="form-control" id="vehicleType" name="vehicleType" value="<?php echo $parking['vehicleType']; ?>">
+                            <select class="form-control" id="vehicleType" name="vehicleType" required>
+                                <option value="None" <?php if ($parking['vehicleType'] == 'None') echo 'selected'; ?>>None</option>
+                                <option value="Car" <?php if ($parking['vehicleType'] == 'Car') echo 'selected'; ?>>Car</option>
+                                <option value="Motorcycle" <?php if ($parking['vehicleType'] == 'Motorcycle') echo 'selected'; ?>>Motorcycle</option>
+                                <option value="Others" <?php if ($parking['vehicleType'] == 'Others') echo 'selected'; ?>>Others</option>
+                            </select>
                         </div>
                         <div class="form-group mb-3">
                             <label for="parkingAvailabilityStatus">Availability</label>
                             <select class="form-control" id="parkingAvailabilityStatus" name="parkingAvailabilityStatus" required>
                                 <option value="Available" <?php if ($parking['parkingAvailabilityStatus'] == 'Available') echo 'selected'; ?>>Available</option>
-                                <option value="Unavailable" <?php if ($parking['parkingAvailabilityStatus'] == 'Not Available') echo 'selected'; ?>>Unavailable</option>
+                                <option value="Unavailable" <?php if ($parking['parkingAvailabilityStatus'] == 'Unavailable') echo 'selected'; ?>>Unavailable</option>
                             </select>
                         </div>
                         <button type="submit" name="update_parking" class="btn btn-success">Update</button>
