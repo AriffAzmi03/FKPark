@@ -34,7 +34,7 @@
                 </a>
                 <div class="collapse" id="collapseParking" aria-labelledby="headingParking" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" href="admin-manage-orders.php">View Parking Space</a>
+                        <a class="nav-link" href="student-view-parking.php">View Parking Space</a>
                     </nav>
                 </div>
 
