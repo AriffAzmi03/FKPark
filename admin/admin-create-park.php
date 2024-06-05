@@ -14,7 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_parking_space'])) 
     $parkingAvailabilityStatus = $_POST['parkingAvailabilityStatus'];
 
     // Prepare and execute the insert query
-    $query = "INSERT INTO parking_spaces (parking_space_name, parking_area, vehicle_type, availability)
+    $query = "INSERT INTO parkingspace (parkingID, parkingType, vehicleType, parkingAvailabilityStatus)
               VALUES (?, ?, ?, ?)";
     $stmt = $conn->prepare($query);
     $stmt->bind_param("ssss", $parkingID, $parkingType, $vehicleType, $parkingAvailabilityStatus);
