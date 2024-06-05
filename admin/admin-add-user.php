@@ -91,6 +91,7 @@ $conn->close();
                             <input type="password" class="form-control" id="studentPassword" name="studentPassword">
                         </div>
                         <button type="submit" name="add_user" class="btn btn-success">Add User</button>
+                        <button type="reset" class="btn btn-secondary">Reset</button>
                     </form>
                     <!-- End Form -->
                 </div>

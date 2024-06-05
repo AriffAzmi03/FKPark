@@ -4,6 +4,23 @@ include('includes/header.php');
 
 // Include database connection file
 include('includes/dbconnection.php');
+
+// Handle delete request
+if (isset($_GET['del'])) {
+    $studentID = $_GET['del'];
+    $delQuery = "DELETE FROM student WHERE studentID = ?";
+    $stmt = $conn->prepare($delQuery);
+    $stmt->bind_param("s", $studentID);
+    
+    if ($stmt->execute()) {
+        $deleteMessage = "<div class='alert alert-success' role='alert'>User deleted successfully!</div>";
+    } else {
+        $deleteMessage = "<div class='alert alert-danger' role='alert'>Error: " . $stmt->error . "</div>";
+    }
+    
+    // Close the statement
+    $stmt->close();
+}
 ?>
 
 <div id="content-wrapper">
@@ -29,6 +46,12 @@ include('includes/dbconnection.php');
                         Registered Users
                     </div>
                     <div class="card-body">
+                        <?php
+                        // Display delete message if set
+                        if (isset($deleteMessage)) {
+                            echo $deleteMessage;
+                        }
+                        ?>
                         <div class="table-responsive">
                             <table class="table table-bordered table-hover table-striped" id="dataTable" width="100%" cellspacing="0">
                                 <thead>
@@ -61,8 +84,8 @@ include('includes/dbconnection.php');
                                             <td><?php echo $row->studentType; ?></td>
                                             <td><?php echo $row->studentYear; ?></td>
                                             <td>
-                                                <a href="admin-manage-single-usr.php?u_id=<?php echo $row->studentID; ?>" class="badge bg-success text-white"><i class="fas fa-user-edit"></i> Update</a>
-                                                <a href="admin-manage-user.php?del=<?php echo $row->studentID; ?>" class="badge bg-danger text-white"><i class="fas fa-trash-alt"></i> Delete</a>
+                                                <a href="admin-edit-user.php?u_id=<?php echo $row->studentID; ?>" class="badge bg-success text-white"><i class="fas fa-user-edit"></i> Update</a>
+                                                <a href="admin-manage-user.php?del=<?php echo $row->studentID; ?>" class="badge bg-danger text-white" onclick="return confirm('Are you sure you want to delete this user?');"><i class="fas fa-trash-alt"></i> Delete</a>
                                             </td>
                                         </tr>
                                     <?php
@@ -113,5 +136,6 @@ include('includes/scripts.php');
         text-overflow: ellipsis;
     }
 </style>
+
 
 

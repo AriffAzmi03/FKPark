@@ -5,7 +5,7 @@
 
                 <!-- Main Section -->
                 <div class="sb-sidenav-menu-heading">Main</div>
-                <a class="nav-link" href="index.php">
+                <a class="nav-link" href="admin-dashboard.php">
                     <div class="sb-nav-link-icon"><i class="fa-solid fa-table-columns"></i></div>
                     Dashboard
                 </a>

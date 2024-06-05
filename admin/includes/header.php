@@ -24,7 +24,7 @@
     <div id="layoutSidenav">
         <?php
         // Include sidebar
-        include('includes/sidebar.php');
+        include('includes/admin-sidebar.php');
         ?>
         <div id="layoutSidenav_content">
             <main>
