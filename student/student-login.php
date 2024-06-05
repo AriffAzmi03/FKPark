@@ -60,7 +60,7 @@ session_start();
 include("includes/dbconnection.php");
 $error = "";
 
-if(isset($_POST['submit'])) {
+if (isset($_POST['submit'])) {
     $email = $_POST['email'];
     $password = $_POST['password'];
 
@@ -71,9 +71,15 @@ if(isset($_POST['submit'])) {
     $result = $stmt->get_result();
     $row = $result->fetch_assoc();
 
-    if($row) {
-        $_SESSION['email'] = $row['studentEmail'];
-        $_SESSION['password'] = $row['studentPassword'];
+    if ($row) {
+        $_SESSION['studentID'] = $row['studentID'];
+        $_SESSION['studentName'] = $row['studentName']; // Store the student's name in the session
+        $_SESSION['studentEmail'] = $row['studentEmail'];
+
+        // Set a cookie that expires in 7 days
+        setcookie("studentID", $row['studentID'], time() + (86400 * 7), "/");
+        setcookie("studentName", $row['studentName'], time() + (86400 * 7), "/");
+
         header("Location: student-dashboard.php");
         exit();
     } else {
@@ -81,7 +87,7 @@ if(isset($_POST['submit'])) {
     }
 
     $stmt->close();
-    $conn->close(); // Corrected variable name
+    $conn->close();
 }
 ?>
 
@@ -121,3 +127,5 @@ if(isset($_POST['submit'])) {
 
 </body>
 </html>
+
+
