@@ -15,9 +15,9 @@ if (isset($_GET['del'])) {
     $stmt->bind_param("s", $parkingID);
 
     if ($stmt->execute()) {
-        echo "<div class='alert alert-success' role='alert'>Parking space deleted successfully!</div>";
+        $deleteMessage = "<div class='alert alert-success' role='alert'>User deleted successfully!</div>";
     } else {
-        echo "<div class='alert alert-danger' role='alert'>Error: " . $stmt->error . "</div>";
+        $deleteMessage = "<div class='alert alert-danger' role='alert'>Error: " . $stmt->error . "</div>";
     }
 
     // Close the statement
@@ -76,8 +76,8 @@ if (isset($_GET['del'])) {
                                             <td><?php echo $row->vehicleType; ?></td>
                                             <td><?php echo $row->parkingAvailabilityStatus; ?></td>
                                             <td>
-                                                <a href="admin-manage-single-parking.php?p_id=<?php echo $row->parkingID; ?>" class="badge bg-success text-white"><i class="fas fa-edit"></i> Update</a>
-                                                <a href="admin-manage-parking.php?del=<?php echo $row->parkingID; ?>" class="badge bg-danger text-white"><i class="fas fa-trash-alt"></i> Delete</a>
+                                            <a href="admin-edit-park.php?u_id=<?php echo $row->parkingID; ?>" class="badge bg-success text-white"><i class="fas fa-user-edit"></i> Update</a>
+                                                <a href="admin-manage-area.php?del=<?php echo $row->parkingID; ?>" class="badge bg-danger text-white" onclick="return confirm('Are you sure you want to delete this parking space?');"><i class="fas fa-trash-alt"></i> Delete</a>
                                             </td>
                                         </tr>
                                     <?php
