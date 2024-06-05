@@ -43,7 +43,7 @@ include('includes/dbconnection.php');
                                 </thead>
                                 <tbody>
                                     <?php
-                                    $ret = "SELECT * FROM parking_spaces ORDER BY RAND() LIMIT 1000";
+                                    $ret = "SELECT * FROM parkingspace ORDER BY RAND() LIMIT 1000";
                                     $stmt = $conn->prepare($ret);
                                     $stmt->execute();
                                     $res = $stmt->get_result();
@@ -52,13 +52,13 @@ include('includes/dbconnection.php');
                                     ?>
                                         <tr>
                                             <td><?php echo $cnt; ?></td>
-                                            <td><?php echo $row->parkingSpaceName; ?></td>
-                                            <td><?php echo $row->parkingArea; ?></td>
+                                            <td><?php echo $row->parkingID; ?></td>
+                                            <td><?php echo $row->parkingType; ?></td>
                                             <td><?php echo $row->vehicleType; ?></td>
-                                            <td><?php echo $row->availability; ?></td>
+                                            <td><?php echo $row->parkingAvailabilityStatus; ?></td>
                                             <td>
-                                                <a href="admin-manage-single-parking.php?p_id=<?php echo $row->id; ?>" class="badge bg-success text-white"><i class="fas fa-edit"></i> Update</a>
-                                                <a href="admin-manage-parking.php?del=<?php echo $row->id; ?>" class="badge bg-danger text-white"><i class="fas fa-trash-alt"></i> Delete</a>
+                                                <a href="admin-manage-single-parking.php?p_id=<?php echo $row->parkingID; ?>" class="badge bg-success text-white"><i class="fas fa-edit"></i> Update</a>
+                                                <a href="admin-manage-parking.php?del=<?php echo $row->parkingID; ?>" class="badge bg-danger text-white"><i class="fas fa-trash-alt"></i> Delete</a>
                                             </td>
                                         </tr>
                                     <?php

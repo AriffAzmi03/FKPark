@@ -8,16 +8,16 @@ include('includes/dbconnection.php');
 // Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_parking_space'])) {
     // Get form data
-    $parkingSpaceName = $_POST['parkingSpaceName'];
-    $parkingArea = $_POST['parkingArea'];
+    $parkingID = $_POST['parkingID'];
+    $parkingType = $_POST['parkingType'];
     $vehicleType = $_POST['vehicleType'];
-    $availability = $_POST['availability'];
+    $parkingAvailabilityStatus = $_POST['parkingAvailabilityStatus'];
 
     // Prepare and execute the insert query
     $query = "INSERT INTO parking_spaces (parking_space_name, parking_area, vehicle_type, availability)
               VALUES (?, ?, ?, ?)";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("ssss", $parkingSpaceName, $parkingArea, $vehicleType, $availability);
+    $stmt->bind_param("ssss", $parkingID, $parkingType, $vehicleType, $parkingAvailabilityStatus);
 
     if ($stmt->execute()) {
         echo "<div class='alert alert-success' role='alert'>New parking space added successfully!</div>";
@@ -52,12 +52,12 @@ $conn->close();
                     <!-- Add Parking Space Form -->
                     <form method="POST">
                         <div class="form-group mb-3">
-                            <label for="parkingSpaceName">Parking Space Name</label>
-                            <input type="text" required class="form-control" id="parkingSpaceName" name="parkingSpaceName">
+                            <label for="parkingID">Parking Space Name</label>
+                            <input type="text" required class="form-control" id="parkingID" name="parkingID">
                         </div>
                         <div class="form-group mb-3">
-                            <label for="parkingArea">Parking Area</label>
-                            <select class="form-control" id="parkingArea" name="parkingArea" required>
+                            <label for="parkingType">Parking Area</label>
+                            <select class="form-control" id="parkingType" name="parkingType" required>
                                 <option value="A">A</option>
                                 <option value="B">B</option>
                             </select>
@@ -72,8 +72,8 @@ $conn->close();
                             </select>
                         </div>
                         <div class="form-group mb-3">
-                            <label for="availability">Availability</label>
-                            <select class="form-control" id="availability" name="availability" required>
+                            <label for="parkingAvailabilityStatus">Availability</label>
+                            <select class="form-control" id="parkingAvailabilityStatus" name="parkingAvailabilityStatus" required>
                                 <option value="Available">Available</option>
                                 <option value="Unavailable">Unavailable</option>
                             </select>
@@ -94,3 +94,19 @@ $conn->close();
 include('includes/footer.php');
 include('includes/scripts.php');
 ?>
+
+<!-- Custom CSS to ensure proper table layout -->
+<style>
+    .table-responsive table {
+        table-layout: auto; /* Adjusted to auto for better column width management */
+        width: 100%;
+    }
+    .table-responsive th, .table-responsive td {
+        word-wrap: break-word;
+    }
+    .table th, .table td {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>
