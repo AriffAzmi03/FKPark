@@ -113,7 +113,7 @@ $conn->close();
                             <label for="studentPassword">Password</label>
                             <input type="password" class="form-control" id="studentPassword" name="studentPassword" value="<?php echo $user['studentPassword']; ?>">
                         </div>
-                        <button type="submit" name="update_user" class="btn btn-success">Update User</button>
+                        <button type="submit" name="update_user" class="btn btn-success">Update</button>
                         <a href="admin-manage-user.php" class="btn btn-secondary">Back</a>
                     </form>
                     <!-- End Form -->
