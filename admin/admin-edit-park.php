@@ -1,0 +1,116 @@
+<?php
+// Include header file
+include('includes/header.php');
+
+// Include database connection file
+include('includes/dbconnection.php');
+
+// Check if parkingID is set in the URL and fetch parking space details
+if (isset($_GET['u_id'])) {
+    $parkingID = $_GET['u_id'];
+    
+    // Fetch parking space details
+    $query = "SELECT * FROM parkingspace WHERE parkingID = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("s", $parkingID);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($result->num_rows > 0) {
+        $parking = $result->fetch_assoc();
+    } else {
+        echo "<div class='alert alert-danger' role='alert'>No parking space found with the given ID.</div>";
+        exit;
+    }
+
+    // Close the statement
+    $stmt->close();
+} else {
+    echo "<div class='alert alert-danger' role='alert'>No parking space ID provided.</div>";
+    exit;
+}
+
+// Handle form submission
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_parking'])) {
+    // Get form data
+    $vehicleType = $_POST['vehicleType'];
+    $parkingAvailabilityStatus = $_POST['parkingAvailabilityStatus'];
+
+    // Prepare and execute the update query
+    $query = "UPDATE parkingspace SET vehicleType = ?, parkingAvailabilityStatus = ? WHERE parkingID = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("sss", $vehicleType, $parkingAvailabilityStatus, $parkingID);
+
+    if ($stmt->execute()) {
+        echo "<div class='alert alert-success' role='alert'>Parking space updated successfully!</div>";
+    } else {
+        echo "<div class='alert alert-danger' role='alert'>Error: " . $stmt->error . "</div>";
+    }
+
+    // Close the statement
+    $stmt->close();
+}
+
+// Close the database connection
+$conn->close();
+?>
+
+<div class="container mt-4">
+    <!-- Breadcrumbs-->
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="admin-manage-area.php">Parking Spaces</a>
+        </li>
+        <li class="breadcrumb-item active">Parking Space Update</li>
+    </ol>
+    <hr>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    Parking Space Update
+                </div>
+                <div class="card-body">
+                    <!-- Update Parking Space Form -->
+                    <form method="POST">
+                        <div class="form-group mb-3">
+                            <label for="parkingID">Parking Space Name</label>
+                            <input type="text" class="form-control" id="parkingID" name="parkingID" value="<?php echo $parking['parkingID']; ?>" disabled>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="parkingType">Parking Area</label>
+                            <input type="text" class="form-control" id="parkingType" name="parkingType" value="<?php echo $parking['parkingType']; ?>" disabled>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="vehicleType">Type of Vehicle</label>
+                            <select class="form-control" id="vehicleType" name="vehicleType" required>
+                                <option value="None" <?php if ($parking['vehicleType'] == 'None') echo 'selected'; ?>>None</option>
+                                <option value="Car" <?php if ($parking['vehicleType'] == 'Car') echo 'selected'; ?>>Car</option>
+                                <option value="Motorcycle" <?php if ($parking['vehicleType'] == 'Motorcycle') echo 'selected'; ?>>Motorcycle</option>
+                                <option value="Others" <?php if ($parking['vehicleType'] == 'Others') echo 'selected'; ?>>Others</option>
+                            </select>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="parkingAvailabilityStatus">Availability</label>
+                            <select class="form-control" id="parkingAvailabilityStatus" name="parkingAvailabilityStatus" required>
+                                <option value="Available" <?php if ($parking['parkingAvailabilityStatus'] == 'Available') echo 'selected'; ?>>Available</option>
+                                <option value="Unavailable" <?php if ($parking['parkingAvailabilityStatus'] == 'Unavailable') echo 'selected'; ?>>Unavailable</option>
+                            </select>
+                        </div>
+                        <button type="submit" name="update_parking" class="btn btn-success">Update</button>
+                        <a href="admin-manage-area.php" class="btn btn-secondary">Back</a>
+                    </form>
+                    <!-- End Form -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<?php
+// Include footer and scripts
+include('includes/footer.php');
+include('includes/scripts.php');
+?>
