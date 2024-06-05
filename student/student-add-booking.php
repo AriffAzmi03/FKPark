@@ -8,16 +8,15 @@ include('includes/dbconnection.php');
 // Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['book_parking_space'])) {
     // Get form data
-    $vehiclePlateNum = $_POST['vehiclePlateNum'];
     $bookingStart = $_POST['bookingStart'];
     $bookingEnd = $_POST['bookingEnd'];
     $bookingDate = $_POST['bookingDate'];
 
     // Prepare and execute the insert query
-    $query = "INSERT INTO booking ( vehiclePlateNum, bookingStart, bookingEnd, bookingDate)
-              VALUES (?, ?, ?, ?, ?)";
+    $query = "INSERT INTO booking (bookingStart, bookingEnd, bookingDate)
+              VALUES (?, ?, ?)";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("ssss",  $vehiclePlateNum, $bookingStart, $bookingEnd, $bookingDate);
+    $stmt->bind_param("sss", $bookingStart, $bookingEnd, $bookingDate);
 
     if ($stmt->execute()) {
         echo "<div class='alert alert-success' role='alert'>Parking space booked successfully!</div>";
@@ -51,10 +50,6 @@ $conn->close();
                 <div class="card-body">
                     <!-- Book Parking Space Form -->
                     <form method="POST">
-                        <div class="form-group mb-3">
-                            <label for="vehiclePlateNum">Vehicle Plate Number</label>
-                            <input type="text" required class="form-control" id="vehiclePlateNum" name="vehiclePlateNum">
-                        </div>
                         <div class="form-group mb-3">
                             <label for="bookingStart">Time Start</label>
                             <input type="time" required class="form-control" id="bookingStart" name="bookingStart">
@@ -97,5 +92,5 @@ include('includes/scripts.php');
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-    }
+    }
 </style>
