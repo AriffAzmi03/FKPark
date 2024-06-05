@@ -2,5 +2,5 @@
     session_start();
     unset($_SESSION['id']);
     session_destroy();
-    header('Location:../ukstaff/ukstaff-login.php');
+    header('Location:../staff/staff-login.php');
 ?>

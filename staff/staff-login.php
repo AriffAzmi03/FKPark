@@ -74,7 +74,7 @@ if(isset($_POST['submit'])) {
     if($row) {
         $_SESSION['email'] = $row['staffEmail'];
         $_SESSION['password'] = $row['staffPassword'];
-        header("Location: ukstaff-dashboard.php");
+        header("Location: staff-dashboard.php");
         exit();
     } else {
         $error = "Wrong Username or Password";

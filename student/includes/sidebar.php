@@ -5,7 +5,7 @@
 
                 <!-- Main Section -->
                 <div class="sb-sidenav-menu-heading">Main</div>
-                <a class="nav-link" href="index.php">
+                <a class="nav-link" href="student-dashboard.php">
                     <div class="sb-nav-link-icon"><i class="fa-solid fa-table-columns"></i></div>
                     Dashboard
                 </a>
@@ -15,14 +15,13 @@
 
                 <!-- Vehicle -->
                 <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseVehicle" aria-expanded="false" aria-controls="collapseVehicle">
-                    <div class="sb-nav-link-icon"><i class="fa-solid fa-car"></i></i></div>
+                    <div class="sb-nav-link-icon"><i class="fa-solid fa-car"></i></div>
                     Vehicle
                     <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                 </a>
                 <div class="collapse" id="collapseVehicle" aria-labelledby="headingVehicle" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" href="admin-add-vehicle.php">Vehicle Registration</a>
-                        <a class="nav-link" href="admin-manage-vehicle.php">List of Vehicle</a>
+                        <a class="nav-link" href="student-manage-vehicle.php">List of Vehicle</a>
                     </nav>
                 </div>
 
@@ -68,8 +67,10 @@
         <!-- Sidenav Footer -->
         <div class="sb-sidenav-footer">
             <div class="small">Logged in as:</div>
-            <p>Student</p>
+            <p><?php echo isset($_SESSION['studentName']) ? $_SESSION['studentName'] : 'Student'; ?></p>
         </div>
     </nav>
 </div>
+
+
 

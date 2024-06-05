@@ -5,7 +5,7 @@
 
                 <!-- Main Section -->
                 <div class="sb-sidenav-menu-heading">Main</div>
-                <a class="nav-link" href="index.php">
+                <a class="nav-link" href="staff-dashboard.php">
                     <div class="sb-nav-link-icon"><i class="fa-solid fa-table-columns"></i></div>
                     Dashboard
                 </a>
@@ -33,8 +33,8 @@
                 </a>
                 <div class="collapse" id="collapseVehicle" aria-labelledby="headingVehicle" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" href="admin-add-vehicle.php">Vehicle Approval</a>
-                        <a class="nav-link" href="admin-manage-vehicle.php">Manage Vehicle</a>
+                        <a class="nav-link" href="staff-approve-vehicle.php">Vehicle Approval</a>
+                        <a class="nav-link" href="staff-view-vehicle.php">Manage Vehicle</a>
                     </nav>
                 </div>
 
