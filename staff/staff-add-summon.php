@@ -620,5 +620,4 @@ $(document).ready(function(){
 <?php
 // Include footer and scripts
 include('includes/footer.php');
-include('includes/scripts.php');
 ?>
