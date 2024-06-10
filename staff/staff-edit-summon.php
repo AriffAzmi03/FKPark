@@ -36,13 +36,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_summon'])) {
     $summonDate = $_POST['summonDate'];
 
     // Prepare and execute the update query
-    $query = "UPDATE summon SET vehiclePlateNum = ?, summonViolationType = ?, summonDemerit = ?, summonDate = ? WHERE summonID = ?";
-    $stmt = $conn->prepare($query);
+    $update_query = "UPDATE summon SET vehiclePlateNum = ?, summonViolationType = ?, summonDemerit = ?, summonDate = ? WHERE summonID = ?";
+    $stmt = $conn->prepare($update_query);
     $stmt->bind_param("sssss", $vehiclePlateNum, $summonViolationType, $summonDemerit, $summonDate, $summonID);
 
     if ($stmt->execute()) {
         echo "<div class='alert alert-success' role='alert'>Summon updated successfully!</div>";
         // Refresh summon details
+        $query = "SELECT * FROM summon WHERE summonID = ?";
         $stmt = $conn->prepare($query);
         $stmt->bind_param("s", $summonID);
         $stmt->execute();
