@@ -57,7 +57,7 @@ session_start();
 <body class="bg-light">
 
 <?php
-include("../includes/dbconnection.php");
+include("includes/dbconnection.php");
 $error = "";
 
 if(isset($_POST['submit'])) {
