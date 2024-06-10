@@ -1,4 +1,6 @@
 <?php
+ob_start(); // Start output buffering
+
 // Include header file
 include('includes/header.php');
 
@@ -20,7 +22,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_parking_space'])) 
     $stmt->bind_param("ssss", $parkingID, $parkingArea, $parkingType, $parkingAvailabilityStatus);
 
     if ($stmt->execute()) {
-        echo "<div class='alert alert-success' role='alert'>New parking space added successfully!</div>";
+        // Redirect to admin-generate-park.php with the last inserted parkingID
+        header("Location: admin-generate-park.php?parkingID=" . $parkingID);
+        exit(); // Ensure no further code is executed
     } else {
         echo "<div class='alert alert-danger' role='alert'>Error: " . $stmt->error . "</div>";
     }
@@ -31,6 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_parking_space'])) 
 
 // Close the database connection
 $conn->close();
+ob_end_flush(); // End output buffering and flush output
 ?>
 
 <div class="container mt-4">
