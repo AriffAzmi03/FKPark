@@ -6,30 +6,55 @@ include('includes/header.php');
 include('includes/dbconnection.php');
 
 // Handle form submission
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['book_parking_space'])) {
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirm_booking'])) {
     // Get form data
+    $parkingID = $_POST['parkingID'];
+    $bookingDate = $_POST['bookingDate'];
     $bookingStart = $_POST['bookingStart'];
     $bookingEnd = $_POST['bookingEnd'];
-    $bookingDate = $_POST['bookingDate'];
 
-    // Prepare and execute the insert query
-    $query = "INSERT INTO booking (bookingStart, bookingEnd, bookingDate)
-              VALUES (?, ?, ?)";
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("sss", $bookingStart, $bookingEnd, $bookingDate);
+    // Start a transaction
+    $conn->begin_transaction();
 
-    if ($stmt->execute()) {
+    try {
+        // Insert into booking table
+        $query = "INSERT INTO booking (parkingID, bookingDate, bookingStart, bookingEnd)
+                  VALUES (?, ?, ?, ?)";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("ssss", $parkingID, $bookingDate, $bookingStart, $bookingEnd);
+        if (!$stmt->execute()) {
+            throw new Exception($stmt->error);
+        }
+
+        // Update parking space status
+        $updateQuery = "UPDATE parkingspace SET parkingAvailabilityStatus = 'Occupied' WHERE parkingID = ?";
+        $stmt = $conn->prepare($updateQuery);
+        $stmt->bind_param("s", $parkingID);
+        if (!$stmt->execute()) {
+            throw new Exception($stmt->error);
+        }
+
+        // Commit transaction
+        $conn->commit();
         echo "<div class='alert alert-success' role='alert'>Parking space booked successfully!</div>";
-    } else {
-        echo "<div class='alert alert-danger' role='alert'>Error: " . $stmt->error . "</div>";
+    } catch (Exception $e) {
+        // Rollback transaction if something went wrong
+        $conn->rollback();
+        echo "<div class='alert alert-danger' role='alert'>Error: " . $e->getMessage() . "</div>";
     }
 
     // Close the statement
     $stmt->close();
+    // Redirect to manage booking page
+    header("Location: student-manage-booking.php");
+    exit();
 }
 
-// Close the database connection
-$conn->close();
+// Get data from URL
+$parkingID = $_GET['parkingID'];
+$bookingDate = $_GET['bookingDate'];
+$bookingStart = $_GET['bookingStart'];
+$bookingEnd = $_GET['bookingEnd'];
 ?>
 
 <div class="container mt-4">
@@ -38,33 +63,40 @@ $conn->close();
         <li class="breadcrumb-item">
             <a href="#">Parking</a>
         </li>
-        <li class="breadcrumb-item active">Book Parking Space</li>
+        <li class="breadcrumb-item active">Confirm Booking</li>
     </ol>
     <hr>
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
                 <div class="card-header">
-                    Book Parking Space
+                    Confirm Booking
                 </div>
                 <div class="card-body">
-                    <!-- Book Parking Space Form -->
                     <form method="POST">
+                        <input type="hidden" name="parkingID" value="<?php echo $parkingID; ?>">
+                        <input type="hidden" name="bookingDate" value="<?php echo $bookingDate; ?>">
+                        <input type="hidden" name="bookingStart" value="<?php echo $bookingStart; ?>">
+                        <input type="hidden" name="bookingEnd" value="<?php echo $bookingEnd; ?>">
+                        
                         <div class="form-group mb-3">
-                            <label for="bookingStart">Time Start</label>
-                            <input type="time" required class="form-control" id="bookingStart" name="bookingStart">
-                        </div>
-                        <div class="form-group mb-3">
-                            <label for="bookingEnd">Time End</label>
-                            <input type="time" required class="form-control" id="bookingEnd" name="bookingEnd">
+                            <label for="parkingID">Parking Space ID</label>
+                            <input type="text" class="form-control" id="parkingID" value="<?php echo $parkingID; ?>" disabled>
                         </div>
                         <div class="form-group mb-3">
                             <label for="bookingDate">Booking Date</label>
-                            <input type="date" required class="form-control" id="bookingDate" name="bookingDate">
+                            <input type="text" class="form-control" id="bookingDate" value="<?php echo $bookingDate; ?>" disabled>
                         </div>
-                        <button type="submit" name="book_parking_space" class="btn btn-success">Book Parking Space</button>
+                        <div class="form-group mb-3">
+                            <label for="bookingStart">Time Start</label>
+                            <input type="text" class="form-control" id="bookingStart" value="<?php echo $bookingStart; ?>" disabled>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="bookingEnd">Time End</label>
+                            <input type="text" class="form-control" id="bookingEnd" value="<?php echo $bookingEnd; ?>" disabled>
+                        </div>
+                        <button type="submit" name="confirm_booking" class="btn btn-success">Confirm Booking</button>
                     </form>
-                    <!-- End Form -->
                 </div>
             </div>
         </div>
