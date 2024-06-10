@@ -6,7 +6,7 @@ include('includes/header.php');
 include('includes/dbconnection.php');
 
 // Retrieve approved vehicles
-$query = "SELECT v.vehicleID, v.vehicleType, v.vehicleBrand, v.vehicleColour, v.vehiclePlateNum, s.studentName 
+$query = "SELECT v.vehicleType, v.vehicleBrand, v.vehicleColour, v.vehiclePlateNum, s.studentName 
           FROM vehicle v 
           JOIN student s ON v.studentID = s.studentID 
           WHERE v.status = 'approved'";
@@ -45,14 +45,14 @@ $result = $conn->query($query);
                             <tbody>
                                 <?php while ($row = $result->fetch_assoc()) { ?>
                                 <tr>
-                                    <td><?php echo $row['vehicleID']; ?></td>
+                                    <td><?php echo $row['vehiclePlateNum']; ?></td>
                                     <td><?php echo $row['vehicleType']; ?></td>
                                     <td><?php echo $row['vehicleBrand']; ?></td>
                                     <td><?php echo $row['vehicleColour']; ?></td>
                                     <td><?php echo $row['vehiclePlateNum']; ?></td>
                                     <td><?php echo $row['studentName']; ?></td>
                                     <td>
-                                        <a href="view-grant.php?id=<?php echo $row['vehicleID']; ?>" class="btn btn-primary btn-sm">View Grant</a>
+                                        <a href="view-grant.php?vehiclePlateNum=<?php echo $row['vehiclePlateNum']; ?>" class="btn btn-primary btn-sm">View Grant</a>
                                     </td>
                                 </tr>
                                 <?php } ?>
@@ -73,5 +73,3 @@ $result = $conn->query($query);
 include('includes/footer.php');
 include('includes/scripts.php');
 ?>
-
-

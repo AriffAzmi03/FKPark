@@ -7,10 +7,10 @@ include('includes/dbconnection.php');
 
 // Handle delete request
 if (isset($_GET['del'])) {
-    $vehicleID = $_GET['del'];
-    $delQuery = "DELETE FROM vehicle WHERE vehicleID = ?";
+    $vehiclePlateNum = $_GET['del'];
+    $delQuery = "DELETE FROM vehicle WHERE vehiclePlateNum = ?";
     $stmt = $conn->prepare($delQuery);
-    $stmt->bind_param("i", $vehicleID);
+    $stmt->bind_param("s", $vehiclePlateNum);
 
     if ($stmt->execute()) {
         $deleteMessage = "<div class='alert alert-success' role='alert'>Vehicle deleted successfully!</div>";
@@ -23,7 +23,7 @@ if (isset($_GET['del'])) {
 }
 
 // Retrieve approved vehicles
-$query = "SELECT v.vehicleID, v.vehicleType, v.vehicleBrand, v.vehicleColour, v.vehiclePlateNum, s.studentName 
+$query = "SELECT v.vehicleType, v.vehicleBrand, v.vehicleColour, v.vehiclePlateNum, s.studentName 
           FROM vehicle v 
           JOIN student s ON v.studentID = s.studentID 
           WHERE v.status = 'approved'";
@@ -85,8 +85,8 @@ $result = $conn->query($query);
                                         <td><?php echo $row['vehiclePlateNum']; ?></td>
                                         <td><?php echo $row['studentName']; ?></td>
                                         <td>
-                                            <a href="admin-view-vehicle.php?vehicleID=<?php echo $row['vehicleID']; ?>" class="badge bg-primary text-white">View</a>
-                                            <a href="admin-manage-vehicle.php?del=<?php echo $row['vehicleID']; ?>" class="badge bg-danger text-white" onclick="return confirm('Are you sure you want to delete this vehicle?');">Delete</a>
+                                            <a href="admin-view-vehicle.php?vehiclePlateNum=<?php echo $row['vehiclePlateNum']; ?>" class="badge bg-primary text-white">View</a>
+                                            <a href="admin-manage-vehicle.php?del=<?php echo $row['vehiclePlateNum']; ?>" class="badge bg-danger text-white" onclick="return confirm('Are you sure you want to delete this vehicle?');">Delete</a>
                                         </td>
                                     </tr>
                                     <?php
@@ -136,5 +136,3 @@ include('includes/scripts.php');
     text-overflow: ellipsis;
 }
 </style>
-
-

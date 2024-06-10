@@ -2,12 +2,12 @@
 // Include database connection file
 include('includes/dbconnection.php');
 
-if (isset($_GET['id'])) {
-    $vehicleID = $_GET['id'];
+if (isset($_GET['vehiclePlateNum'])) {
+    $vehiclePlateNum = $_GET['vehiclePlateNum'];
 
-    $query = "SELECT vehicleGrant FROM vehicle WHERE vehicleID = ?";
+    $query = "SELECT vehicleGrant FROM vehicle WHERE vehiclePlateNum = ?";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("i", $vehicleID);
+    $stmt->bind_param("s", $vehiclePlateNum);
     $stmt->execute();
     $stmt->store_result();
     $stmt->bind_result($vehicleGrant);

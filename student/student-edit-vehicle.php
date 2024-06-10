@@ -6,12 +6,12 @@ include('includes/header.php');
 include('includes/dbconnection.php');
 
 // Retrieve vehicle details
-if (isset($_GET['vehicleID'])) {
-    $vehicleID = $_GET['vehicleID'];
+if (isset($_GET['vehiclePlateNum'])) {
+    $vehiclePlateNum = $_GET['vehiclePlateNum'];
 
-    $query = "SELECT vehicleID, vehicleType, vehicleBrand, vehicleColour, vehiclePlateNum, vehicleGrant FROM vehicle WHERE vehicleID = ?";
+    $query = "SELECT vehicleType, vehicleBrand, vehicleColour, vehiclePlateNum, vehicleGrant FROM vehicle WHERE vehiclePlateNum = ?";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("i", $vehicleID);
+    $stmt->bind_param("s", $vehiclePlateNum);
     $stmt->execute();
     $result = $stmt->get_result();
     $vehicle = $result->fetch_assoc();
@@ -44,15 +44,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['edit_vehicle'])) {
     }
 
     // Prepare and execute the update query
-    $query = "UPDATE vehicle SET vehicleType = ?, vehicleBrand = ?, vehicleColour = ?, vehiclePlateNum = ?, vehicleGrant = ? WHERE vehicleID = ?";
+    $query = "UPDATE vehicle SET vehicleType = ?, vehicleBrand = ?, vehicleColour = ?, vehiclePlateNum = ?, vehicleGrant = ? WHERE vehiclePlateNum = ?";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("sssssi", $vehicleType, $vehicleBrand, $vehicleColour, $vehiclePlateNum, $vehicleGrant, $vehicleID);
+    $stmt->bind_param("ssssss", $vehicleType, $vehicleBrand, $vehicleColour, $vehiclePlateNum, $vehicleGrant, $vehiclePlateNum);
 
     if ($stmt->execute()) {
         echo "<div class='alert alert-success' role='alert'>Vehicle updated successfully!</div>";
         // Refresh vehicle details
         $stmt = $conn->prepare($query);
-        $stmt->bind_param("i", $vehicleID);
+        $stmt->bind_param("s", $vehiclePlateNum);
         $stmt->execute();
         $result = $stmt->get_result();
         $vehicle = $result->fetch_assoc();

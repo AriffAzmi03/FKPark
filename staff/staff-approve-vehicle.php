@@ -6,13 +6,13 @@ include('includes/header.php');
 include('includes/dbconnection.php');
 
 // Handle approval/rejection
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['vehicle_id'])) {
-    $vehicle_id = $_POST['vehicle_id'];
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['vehiclePlateNum'])) {
+    $vehiclePlateNum = $_POST['vehiclePlateNum'];
     $status = $_POST['status'];
 
-    $query = "UPDATE vehicle SET status = ? WHERE vehicleID = ?";
+    $query = "UPDATE vehicle SET status = ? WHERE vehiclePlateNum = ?";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("si", $status, $vehicle_id);
+    $stmt->bind_param("ss", $status, $vehiclePlateNum);
 
     if ($stmt->execute()) {
         echo "<div class='alert alert-success' role='alert'>Vehicle status updated successfully!</div>";
@@ -25,10 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['vehicle_id'])) {
 }
 
 // Retrieve pending vehicles
-$query = "SELECT v.vehicleID, v.vehicleType, v.vehicleBrand, v.vehicleColour, v.vehiclePlateNum, s.studentName 
-          FROM vehicle v 
-          JOIN student s ON v.studentID = s.studentID 
-          WHERE v.status = 'pending'";
+$query = "SELECT vehiclePlateNum, vehicleType, vehicleBrand, vehicleColour, studentID FROM vehicle WHERE status = 'pending'";
 $result = $conn->query($query);
 ?>
 
@@ -57,27 +54,30 @@ $result = $conn->query($query);
                                     <th>Vehicle Brand</th>
                                     <th>Vehicle Colour</th>
                                     <th>Vehicle Plate Number</th>
-                                    <th>Student Name</th>
+                                    <th>Student ID</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php while ($row = $result->fetch_assoc()) { ?>
+                                <?php
+                                $cnt = 1;
+                                while ($row = $result->fetch_assoc()) {
+                                ?>
                                 <tr>
-                                    <td><?php echo $row['vehicleID']; ?></td>
+                                    <td><?php echo $cnt++; ?></td>
                                     <td><?php echo $row['vehicleType']; ?></td>
                                     <td><?php echo $row['vehicleBrand']; ?></td>
                                     <td><?php echo $row['vehicleColour']; ?></td>
                                     <td><?php echo $row['vehiclePlateNum']; ?></td>
-                                    <td><?php echo $row['studentName']; ?></td>
+                                    <td><?php echo $row['studentID']; ?></td>
                                     <td>
                                         <form method="POST" style="display:inline;">
-                                            <input type="hidden" name="vehicle_id" value="<?php echo $row['vehicleID']; ?>">
+                                            <input type="hidden" name="vehiclePlateNum" value="<?php echo $row['vehiclePlateNum']; ?>">
                                             <input type="hidden" name="status" value="approved">
                                             <button type="submit" class="btn btn-success btn-sm">Approve</button>
                                         </form>
                                         <form method="POST" style="display:inline;">
-                                            <input type="hidden" name="vehicle_id" value="<?php echo $row['vehicleID']; ?>">
+                                            <input type="hidden" name="vehiclePlateNum" value="<?php echo $row['vehiclePlateNum']; ?>">
                                             <input type="hidden" name="status" value="rejected">
                                             <button type="submit" class="btn btn-danger btn-sm">Reject</button>
                                         </form>
