@@ -1,31 +1,19 @@
 <?php
-// Start the session
-session_start();
-
-// Check if the student is logged in
-if (!isset($_SESSION['studentID'])) {
-    header("Location: student-login.php");
-    exit();
-}
-
 // Include header file
 include('includes/header.php');
 
 // Include database connection file
 include('includes/dbconnection.php');
 
-// Get the student ID from the session
-$studentID = $_SESSION['studentID'];
-
 // Handle delete request
 if (isset($_GET['del'])) {
-    $vehiclePlateNum = $_GET['del'];
-    $delQuery = "DELETE FROM vehicle WHERE vehiclePlateNum = ? AND studentID = ?";
+    $summonID = $_GET['del'];
+    $delQuery = "DELETE FROM summon WHERE summonID = ?";
     $stmt = $conn->prepare($delQuery);
-    $stmt->bind_param("ss", $vehiclePlateNum, $studentID);
+    $stmt->bind_param("s", $summonID);
 
     if ($stmt->execute()) {
-        $deleteMessage = "<div class='alert alert-success' role='alert'>Vehicle deleted successfully!</div>";
+        $deleteMessage = "<div class='alert alert-success' role='alert'>Summon deleted successfully!</div>";
     } else {
         $deleteMessage = "<div class='alert alert-danger' role='alert'>Error: " . $stmt->error . "</div>";
     }
@@ -34,12 +22,9 @@ if (isset($_GET['del'])) {
     $stmt->close();
 }
 
-// Retrieve vehicles registered by the student
-$query = "SELECT vehiclePlateNum, vehicleType, vehicleBrand, vehicleColour FROM vehicle WHERE studentID = ?";
-$stmt = $conn->prepare($query);
-$stmt->bind_param("s", $studentID);
-$stmt->execute();
-$result = $stmt->get_result();
+// Retrieve all summons
+$query = "SELECT summonID, vehiclePlateNum, summonViolationType, summonDemerit, summonDate FROM summon";
+$result = $conn->query($query);
 ?>
 
 <div id="content-wrapper">
@@ -49,9 +34,9 @@ $result = $stmt->get_result();
             <div class="col-md-12">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item">
-                        <a href="#">Vehicles</a>
+                        <a href="#">Summons</a>
                     </li>
-                    <li class="breadcrumb-item active">Manage Vehicles</li>
+                    <li class="breadcrumb-item active">Manage Summons</li>
                 </ol>
             </div>
         </div>
@@ -62,7 +47,7 @@ $result = $stmt->get_result();
                 <div class="card mb-4">
                     <div class="card-header">
                         <i class="fas fa-car"></i>
-                        My Vehicles
+                        Registered Summons
                     </div>
                     <div class="card-body">
                         <?php
@@ -76,10 +61,10 @@ $result = $stmt->get_result();
                                 <thead>
                                     <tr>
                                         <th>#</th>
-                                        <th>Vehicle Type</th>
-                                        <th>Vehicle Brand</th>
-                                        <th>Vehicle Colour</th>
                                         <th>Vehicle Plate Number</th>
+                                        <th>Violation Type</th>
+                                        <th>Demerit Points</th>
+                                        <th>Summon Date</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -90,14 +75,13 @@ $result = $stmt->get_result();
                                     ?>
                                     <tr>
                                         <td><?php echo $cnt++; ?></td>
-                                        <td><?php echo $row['vehicleType']; ?></td>
-                                        <td><?php echo $row['vehicleBrand']; ?></td>
-                                        <td><?php echo $row['vehicleColour']; ?></td>
                                         <td><?php echo $row['vehiclePlateNum']; ?></td>
+                                        <td><?php echo $row['summonViolationType']; ?></td>
+                                        <td><?php echo $row['summonDemerit']; ?></td>
+                                        <td><?php echo $row['summonDate']; ?></td>
                                         <td>
-                                            <a href="student-view-vehicle.php?vehiclePlateNum=<?php echo $row['vehiclePlateNum']; ?>" class="badge bg-primary text-white">View</a>
-                                            <a href="student-edit-vehicle.php?vehiclePlateNum=<?php echo $row['vehiclePlateNum']; ?>" class="badge bg-success text-white">Edit</a>
-                                            <a href="student-manage-vehicle.php?del=<?php echo $row['vehiclePlateNum']; ?>" class="badge bg-danger text-white" onclick="return confirm('Are you sure you want to delete this vehicle?');">Delete</a>
+                                            <a href="staff-view-summon.php?summonID=<?php echo $row['summonID']; ?>" class="badge bg-primary text-white">View</a>
+                                            <a href="staff-manage-summon.php?del=<?php echo $row['summonID']; ?>" class="badge bg-danger text-white" onclick="return confirm('Are you sure you want to delete this summon?');">Delete</a>
                                         </td>
                                     </tr>
                                     <?php

@@ -58,7 +58,7 @@
                 </a>
                 <div class="collapse" id="collapseSummon" aria-labelledby="headingSummon" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" href="admin-manage-orders.php">View Demerit Point</a>
+                        <a class="nav-link" href="student-manage-summon.php">View Demerit Point</a>
                     </nav>
                 </div>
 

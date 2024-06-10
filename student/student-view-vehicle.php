@@ -6,12 +6,12 @@ include('includes/header.php');
 include('includes/dbconnection.php');
 
 // Retrieve vehicle details
-if (isset($_GET['vehicleID'])) {
-    $vehicleID = $_GET['vehicleID'];
+if (isset($_GET['vehiclePlateNum'])) {
+    $vehiclePlateNum = $_GET['vehiclePlateNum'];
 
-    $query = "SELECT vehicleID, vehicleType, vehicleBrand, vehicleColour, vehiclePlateNum, vehicleGrant, status FROM vehicle WHERE vehicleID = ?";
+    $query = "SELECT vehicleType, vehicleBrand, vehicleColour, vehiclePlateNum, vehicleGrant, status FROM vehicle WHERE vehiclePlateNum = ?";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("i", $vehicleID);
+    $stmt->bind_param("s", $vehiclePlateNum);
     $stmt->execute();
     $result = $stmt->get_result();
     $vehicle = $result->fetch_assoc();
@@ -46,7 +46,7 @@ if (isset($_GET['vehicleID'])) {
                     <p><strong>Status:</strong> <?php echo ucfirst($vehicle['status']); ?></p>
                     <h5 class="card-title">Vehicle Grant</h5>
                     <?php if ($vehicle['vehicleGrant']) { ?>
-                    <a href="view-grant.php?vehicleID=<?php echo $vehicle['vehicleID']; ?>" class="btn btn-primary btn-sm">View Grant</a>
+                    <a href="view-grant.php?vehiclePlateNum=<?php echo $vehicle['vehiclePlateNum']; ?>" class="btn btn-primary btn-sm">View Grant</a>
                     <?php } else { ?>
                     <p>No grant uploaded for this vehicle.</p>
                     <?php } ?>

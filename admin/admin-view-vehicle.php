@@ -6,15 +6,15 @@ include('includes/header.php');
 include('includes/dbconnection.php');
 
 // Retrieve vehicle details
-if (isset($_GET['vehicleID'])) {
-    $vehicleID = $_GET['vehicleID'];
+if (isset($_GET['vehiclePlateNum'])) {
+    $vehiclePlateNum = $_GET['vehiclePlateNum'];
 
-    $query = "SELECT v.vehicleID, v.vehicleType, v.vehicleBrand, v.vehicleColour, v.vehiclePlateNum, v.vehicleGrant, v.status, s.studentName, s.studentID, s.studentPhoneNum, s.studentAddress, s.studentType, s.studentYear, s.studentEmail 
+    $query = "SELECT v.vehicleType, v.vehicleBrand, v.vehicleColour, v.vehiclePlateNum, v.vehicleGrant, v.status, s.studentName, s.studentID, s.studentPhoneNum, s.studentAddress, s.studentType, s.studentYear, s.studentEmail 
               FROM vehicle v 
               JOIN student s ON v.studentID = s.studentID 
-              WHERE v.vehicleID = ?";
+              WHERE v.vehiclePlateNum = ?";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("i", $vehicleID);
+    $stmt->bind_param("s", $vehiclePlateNum);
     $stmt->execute();
     $result = $stmt->get_result();
     $vehicle = $result->fetch_assoc();
@@ -57,7 +57,7 @@ if (isset($_GET['vehicleID'])) {
                     <p><strong>Email:</strong> <?php echo $vehicle['studentEmail']; ?></p>
                     <h5 class="card-title">Vehicle Grant</h5>
                     <?php if ($vehicle['vehicleGrant']) { ?>
-                    <a href="view-grant.php?vehicleID=<?php echo $vehicle['vehicleID']; ?>" class="btn btn-primary btn-sm">View Grant</a>
+                    <a href="view-grant.php?vehiclePlateNum=<?php echo $vehicle['vehiclePlateNum']; ?>" class="btn btn-primary btn-sm">View Grant</a>
                     <?php } else { ?>
                     <p>No grant uploaded for this vehicle.</p>
                     <?php } ?>
@@ -75,5 +75,3 @@ if (isset($_GET['vehicleID'])) {
 include('includes/footer.php');
 include('includes/scripts.php');
 ?>
-
-
