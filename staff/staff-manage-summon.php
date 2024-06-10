@@ -81,6 +81,7 @@ $result = $conn->query($query);
                                         <td><?php echo $row['summonDate']; ?></td>
                                         <td>
                                             <a href="staff-view-summon.php?summonID=<?php echo $row['summonID']; ?>" class="badge bg-primary text-white">View</a>
+                                            <a href="staff-edit-summon.php?summonID=<?php echo $row['summonID']; ?>" class="badge bg-success text-white">Edit</a>
                                             <a href="staff-manage-summon.php?del=<?php echo $row['summonID']; ?>" class="badge bg-danger text-white" onclick="return confirm('Are you sure you want to delete this summon?');">Delete</a>
                                         </td>
                                     </tr>
