@@ -9,7 +9,7 @@ if (isset($_GET['parkingID'])) {
     $parkingID = $_GET['parkingID'];
 
     // Fetch the newly added parking space from the database
-    $query = "SELECT parkingID, parkingArea, parkingType, parkingAvailabilityStatus FROM parkingspace WHERE parkingID = ?";
+    $query = "SELECT parkingID, parkingArea, parkingType, parkingAvailabilityStatus, parkingAddDetail FROM parkingspace WHERE parkingID = ?";
     $stmt = $conn->prepare($query);
     $stmt->bind_param("s", $parkingID);
     $stmt->execute();
@@ -20,33 +20,39 @@ if (isset($_GET['parkingID'])) {
         echo "
         <div class='container mt-4'>
             <div class='card'>
-                <div class='card-header'>
-                    Newly Added Parking Space
+                <div class='card-header d-flex justify-content-between align-items-center'>
+                    <span>Newly Added Parking Space</span>
+                    <a href='admin-manage-area.php' class='btn btn-success'>Manage Parking</a>
                 </div>
                 <div class='card-body'>
                     <div class='table-responsive'>
                         <table class='table table-bordered'>
-                            <thead>
-                                <tr>
-                                    <th>Parking Space Name</th>
-                                    <th>Parking Area</th>
-                                    <th>Vehicle Type</th>
-                                    <th>Availability</th>
-                                </tr>
-                            </thead>
                             <tbody>
                                 <tr>
+                                    <th>Parking Space Name</th>
                                     <td>" . htmlspecialchars($row["parkingID"]) . "</td>
+                                </tr>
+                                <tr>
+                                    <th>Parking Area</th>
                                     <td>" . htmlspecialchars($row["parkingArea"]) . "</td>
+                                </tr>
+                                <tr>
+                                    <th>Vehicle Type</th>
                                     <td>" . htmlspecialchars($row["parkingType"]) . "</td>
+                                </tr>
+                                <tr>
+                                    <th>Availability</th>
                                     <td>" . htmlspecialchars($row["parkingAvailabilityStatus"]) . "</td>
+                                </tr>
+                                <tr>
+                                    <th>Additional Notes</th>
+                                    <td>" . htmlspecialchars($row["parkingAddDetail"]) . "</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
-                    <div class='mt-3 text-center'>
-                        <a href='admin-create-park.php' class='btn btn-dark'>Add New Parking Space</a>
-                        <a href='admin-manage-area.php' class='btn btn-success'>Manage Parking Area</a>
+                    <div class='mt-3 text-left'>
+                        <a href='admin-create-park.php' class='btn btn-dark'>Add Parking</a>
                     </div>
                 </div>
             </div>
@@ -72,7 +78,7 @@ include('includes/scripts.php');
 <!-- Custom CSS to ensure proper table layout -->
 <style>
     .table-responsive table {
-        table-layout: auto; /* Adjusted to auto for better column width management */
+        table-layout: fixed; /* Adjusted to auto for better column width management */
         width: 100%;
     }
     .table-responsive th, .table-responsive td {
