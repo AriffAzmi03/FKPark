@@ -17,6 +17,16 @@ if (isset($_GET['parkingID'])) {
 
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
+        // Generate QR code
+        $qrText = "Parking ID: " . $row['parkingID'] . "\nArea: " . $row['parkingArea'] . "\nType: " . $row['parkingType'] . "\nAvailability: " . $row['parkingAvailabilityStatus'] . "\nAdditional Details: " . $row['parkingAddDetail'];
+        // Include QR code library
+        include('path/to/qr/code/library/phpqrcode.php');
+        // Set path for saving QR code image
+        $qrImagePath = 'path/to/save/qr/images/' . $row['parkingID'] . '.png';
+        // Generate QR code image
+        QRcode::png($qrText, $qrImagePath, QR_ECLEVEL_L, 4);
+
+        // Display the parking space details along with QR code
         echo "
         <div class='container mt-4'>
             <div class='card'>
@@ -48,6 +58,10 @@ if (isset($_GET['parkingID'])) {
                                     <th>Additional Notes</th>
                                     <td>" . htmlspecialchars($row["parkingAddDetail"]) . "</td>
                                 </tr>
+                                <tr>
+                                    <th>QR Code</th>
+                                    <td><img src='" . $qrImagePath . "' alt='QR Code'></td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -74,19 +88,3 @@ if (isset($_GET['parkingID'])) {
 include('includes/footer.php');
 include('includes/scripts.php');
 ?>
-
-<!-- Custom CSS to ensure proper table layout -->
-<style>
-    .table-responsive table {
-        table-layout: fixed; /* Adjusted to auto for better column width management */
-        width: 100%;
-    }
-    .table-responsive th, .table-responsive td {
-        word-wrap: break-word;
-    }
-    .table th, .table td {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-</style>
