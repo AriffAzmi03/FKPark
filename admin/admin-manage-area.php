@@ -57,11 +57,12 @@ if (isset($_GET['del'])) {
                                 <thead>
                                     <tr>
                                         <th style="width: 5%;">#</th>
-                                        <th style="width: 20%;">Parking Space Name</th>
-                                        <th style="width: 20%;">Parking Area</th>
-                                        <th style="width: 20%;">Vehicle Type</th>
+                                        <th style="width: 15%;">Parking Space Name</th>
+                                        <th style="width: 15%;">Parking Area</th>
+                                        <th style="width: 15%;">Vehicle Type</th>
                                         <th style="width: 15%;">Availability</th>
-                                        <th style="width: 10%;">Action</th>
+                                        <th style="width: 20%;">Additional Notes</th>
+                                        <th style="width: 15%;">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -75,10 +76,11 @@ if (isset($_GET['del'])) {
                                     ?>
                                         <tr>
                                             <td><?php echo $cnt; ?></td>
-                                            <td><?php echo $row->parkingID; ?></td>
-                                            <td><?php echo $row->parkingArea; ?></td>
-                                            <td><?php echo $row->parkingType; ?></td>
-                                            <td><?php echo $row->parkingAvailabilityStatus; ?></td>
+                                            <td><?php echo htmlspecialchars($row->parkingID); ?></td>
+                                            <td><?php echo htmlspecialchars($row->parkingArea); ?></td>
+                                            <td><?php echo htmlspecialchars($row->parkingType); ?></td>
+                                            <td><?php echo htmlspecialchars($row->parkingAvailabilityStatus); ?></td>
+                                            <td><?php echo htmlspecialchars(isset($row->parkingAddDetail) ? $row->parkingAddDetail : ''); ?></td>
                                             <td>
                                                 <a href="admin-edit-park.php?u_id=<?php echo $row->parkingID; ?>" class="badge bg-success text-white"><i class="fas fa-user-edit"></i> Update</a>
                                                 <a href="admin-manage-area.php?del=<?php echo $row->parkingID; ?>" class="badge bg-danger text-white" onclick="return confirm('Are you sure you want to delete this parking space?');"><i class="fas fa-trash-alt"></i> Delete</a>

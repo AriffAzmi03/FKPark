@@ -14,12 +14,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_parking_space'])) 
     $parkingArea = $_POST['parkingArea'];
     $parkingType = $_POST['parkingType'];
     $parkingAvailabilityStatus = $_POST['parkingAvailabilityStatus'];
+    $parkingAddDetail = $_POST['parkingAddDetail'];
 
     // Prepare and execute the insert query
-    $query = "INSERT INTO parkingspace (parkingID, parkingArea, parkingType, parkingAvailabilityStatus)
-              VALUES (?, ?, ?, ?)";
+    $query = "INSERT INTO parkingspace (parkingID, parkingArea, parkingType, parkingAvailabilityStatus, parkingAddDetail)
+              VALUES (?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("ssss", $parkingID, $parkingArea, $parkingType, $parkingAvailabilityStatus);
+    $stmt->bind_param("sssss", $parkingID, $parkingArea, $parkingType, $parkingAvailabilityStatus, $parkingAddDetail);
 
     if ($stmt->execute()) {
         // Redirect to admin-generate-park.php with the last inserted parkingID
@@ -70,10 +71,8 @@ ob_end_flush(); // End output buffering and flush output
                         <div class="form-group mb-3">
                             <label for="parkingType">Vehicle Type</label>
                             <select class="form-control" id="parkingType" name="parkingType" required>
-                                <option value="None">None</option>
                                 <option value="Car">Car</option>
                                 <option value="Motorcycle">Motorcycle</option>
-                                <option value="Others">Others</option>
                             </select>
                         </div>
                         <div class="form-group mb-3">
@@ -82,6 +81,10 @@ ob_end_flush(); // End output buffering and flush output
                                 <option value="Available">Available</option>
                                 <option value="Unavailable">Unavailable</option>
                             </select>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="parkingAddDetail">Additional Notes</label>
+                            <input type="text" required class="form-control" id="parkingAddDetail" name="parkingAddDetail">
                         </div>
                         <button type="submit" name="add_parking_space" class="btn btn-success">Add Parking Space</button>
                     </form>

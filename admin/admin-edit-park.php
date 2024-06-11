@@ -33,13 +33,13 @@ if (isset($_GET['u_id'])) {
 // Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_parking'])) {
     // Get form data
-    $parkingType = $_POST['parkingType'];
     $parkingAvailabilityStatus = $_POST['parkingAvailabilityStatus'];
+    $parkingAddDetail = $_POST['parkingAddDetail'];
 
     // Prepare and execute the update query
-    $query = "UPDATE parkingspace SET parkingType = ?, parkingAvailabilityStatus = ? WHERE parkingID = ?";
+    $query = "UPDATE parkingspace SET parkingAvailabilityStatus = ?, parkingAddDetail = ? WHERE parkingID = ?";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("sss", $parkingType, $parkingAvailabilityStatus, $parkingID);
+    $stmt->bind_param("sss", $parkingAvailabilityStatus, $parkingAddDetail, $parkingID);
 
     if ($stmt->execute()) {
         echo "<div class='alert alert-success' role='alert'>Parking space updated successfully!</div>";
@@ -75,20 +75,15 @@ $conn->close();
                     <form method="POST">
                         <div class="form-group mb-3">
                             <label for="parkingID">Parking Space Name</label>
-                            <input type="text" class="form-control" id="parkingID" name="parkingID" value="<?php echo $parking['parkingID']; ?>" disabled>
+                            <input type="text" class="form-control" id="parkingID" name="parkingID" value="<?php echo htmlspecialchars($parking['parkingID']); ?>" disabled>
                         </div>
                         <div class="form-group mb-3">
-                            <label for="pparkingArea">Parking Area</label>
-                            <input type="text" class="form-control" id="parkingArea" name="parkingArea" value="<?php echo $parking['parkingArea']; ?>" disabled>
+                            <label for="parkingArea">Parking Area</label>
+                            <input type="text" class="form-control" id="parkingArea" name="parkingArea" value="<?php echo htmlspecialchars($parking['parkingArea']); ?>" disabled>
                         </div>
                         <div class="form-group mb-3">
                             <label for="parkingType">Type of Vehicle</label>
-                            <select class="form-control" id="parkingType" name="parkingType" required>
-                                <option value="None" <?php if ($parking['parkingType'] == 'None') echo 'selected'; ?>>None</option>
-                                <option value="Car" <?php if ($parking['parkingType'] == 'Car') echo 'selected'; ?>>Car</option>
-                                <option value="Motorcycle" <?php if ($parking['parkingType'] == 'Motorcycle') echo 'selected'; ?>>Motorcycle</option>
-                                <option value="Others" <?php if ($parking['parkingType'] == 'Others') echo 'selected'; ?>>Others</option>
-                            </select>
+                            <input type="text" class="form-control" id="parkingType" name="parkingType" value="<?php echo htmlspecialchars($parking['parkingType']); ?>" disabled>
                         </div>
                         <div class="form-group mb-3">
                             <label for="parkingAvailabilityStatus">Availability</label>
@@ -96,6 +91,10 @@ $conn->close();
                                 <option value="Available" <?php if ($parking['parkingAvailabilityStatus'] == 'Available') echo 'selected'; ?>>Available</option>
                                 <option value="Unavailable" <?php if ($parking['parkingAvailabilityStatus'] == 'Unavailable') echo 'selected'; ?>>Unavailable</option>
                             </select>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="parkingAddDetail">Additional Notes</label>
+                            <input type="text" class="form-control" id="parkingAddDetail" name="parkingAddDetail" value="<?php echo htmlspecialchars(isset($parking['parkingAddDetail']) ? $parking['parkingAddDetail'] : ''); ?>" required>
                         </div>
                         <button type="submit" name="update_parking" class="btn btn-success">Update</button>
                         <a href="admin-manage-area.php" class="btn btn-secondary">Back</a>
