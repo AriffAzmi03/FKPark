@@ -8,10 +8,12 @@ include('includes/dbconnection.php');
 // Handle delete request
 if (isset($_GET['del'])) {
     $studentID = $_GET['del'];
+    // Prepare delete query
     $delQuery = "DELETE FROM student WHERE studentID = ?";
     $stmt = $conn->prepare($delQuery);
     $stmt->bind_param("s", $studentID);
     
+    // Execute the query and set the delete message
     if ($stmt->execute()) {
         $deleteMessage = "<div class='alert alert-success' role='alert'>User deleted successfully!</div>";
     } else {
@@ -20,6 +22,12 @@ if (isset($_GET['del'])) {
     
     // Close the statement
     $stmt->close();
+}
+
+// Handle search request
+$searchQuery = "";
+if (isset($_GET['search'])) {
+    $searchQuery = $_GET['search'];
 }
 ?>
 
@@ -41,9 +49,13 @@ if (isset($_GET['del'])) {
         <div class="row justify-content-center">
             <div class="col-md-12">
                 <div class="card mb-4">
-                    <div class="card-header">
-                        <i class="fas fa-users"></i>
-                        Registered Users
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-users"></i> Registered Users</span>
+                        <!-- Search Form -->
+                        <form class="form-inline d-flex" method="get" action="">
+                            <input class="form-control mr-2" type="search" placeholder="Search" aria-label="Search" name="search" value="<?php echo htmlspecialchars($searchQuery); ?>">
+                            <button class="btn btn-outline-success" type="submit">Search</button>
+                        </form>
                     </div>
                     <div class="card-body">
                         <?php
@@ -68,11 +80,22 @@ if (isset($_GET['del'])) {
                                 </thead>
                                 <tbody>
                                     <?php
-                                    $ret = "SELECT * FROM student ORDER BY RAND() LIMIT 1000";
-                                    $stmt = $conn->prepare($ret);
+                                    // Prepare the query to fetch students
+                                    $query = "SELECT * FROM student";
+                                    if (!empty($searchQuery)) {
+                                        $query .= " WHERE studentName LIKE ? OR studentID LIKE ? OR studentEmail LIKE ? OR studentPhoneNum LIKE ? OR studentType LIKE ? OR studentYear LIKE ?";
+                                    }
+                                    $query .= " ORDER BY created_at DESC LIMIT 1000";
+                                    
+                                    $stmt = $conn->prepare($query);
+                                    if (!empty($searchQuery)) {
+                                        $searchParam = "%" . $searchQuery . "%";
+                                        $stmt->bind_param("ssssss", $searchParam, $searchParam, $searchParam, $searchParam, $searchParam, $searchParam);
+                                    }
                                     $stmt->execute();
                                     $res = $stmt->get_result();
                                     $cnt = 1;
+                                    // Fetch and display student records
                                     while ($row = $res->fetch_object()) {
                                     ?>
                                         <tr>
@@ -84,6 +107,7 @@ if (isset($_GET['del'])) {
                                             <td><?php echo $row->studentType; ?></td>
                                             <td><?php echo $row->studentYear; ?></td>
                                             <td>
+                                                <!-- Update and Delete buttons -->
                                                 <a href="admin-edit-user.php?u_id=<?php echo $row->studentID; ?>" class="badge bg-success text-white"><i class="fas fa-user-edit"></i> Update</a>
                                                 <a href="admin-manage-user.php?del=<?php echo $row->studentID; ?>" class="badge bg-danger text-white" onclick="return confirm('Are you sure you want to delete this user?');"><i class="fas fa-trash-alt"></i> Delete</a>
                                             </td>
@@ -97,6 +121,7 @@ if (isset($_GET['del'])) {
                         </div>
                     </div>
                     <div class="card-footer small text-muted">
+                        <!-- Display the current time -->
                         <?php
                         date_default_timezone_set("Asia/Kuala_Lumpur");
                         echo "Generated : " . date("h:i:sa");
@@ -136,6 +161,3 @@ include('includes/scripts.php');
         text-overflow: ellipsis;
     }
 </style>
-
-
-
