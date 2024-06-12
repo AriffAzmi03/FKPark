@@ -99,7 +99,11 @@ ob_end_flush(); // End output buffering and flush output
                         </div>
                         <div class="form-group mb-3">
                             <label for="parkingAddDetail">Additional Notes</label>
-                            <input type="text" class="form-control" id="parkingAddDetail" name="parkingAddDetail">
+                            <select class="form-control" id="parkingAddDetail" name="parkingAddDetail" required>
+                                <option value="Not Applicable">Not Applicable</option>
+                                <option value="Maintenance">Maintenance</option>
+                                <option value="Events">Events</option>
+                            </select>
                         </div>
                         <button type="submit" name="add_parking_space" class="btn btn-success">Add Parking Space</button>
                     </form>
