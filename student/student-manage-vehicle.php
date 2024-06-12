@@ -35,7 +35,7 @@ if (isset($_GET['del'])) {
 }
 
 // Retrieve vehicles registered by the student
-$query = "SELECT vehiclePlateNum, vehicleType, vehicleBrand, vehicleColour FROM vehicle WHERE studentID = ?";
+$query = "SELECT vehiclePlateNum, vehicleType, vehicleBrand, vehicleColour, status FROM vehicle WHERE studentID = ?";
 $stmt = $conn->prepare($query);
 $stmt->bind_param("s", $studentID);
 $stmt->execute();
@@ -80,6 +80,7 @@ $result = $stmt->get_result();
                                         <th>Vehicle Brand</th>
                                         <th>Vehicle Colour</th>
                                         <th>Vehicle Plate Number</th>
+                                        <th>Status</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -87,63 +88,31 @@ $result = $stmt->get_result();
                                     <?php
                                     $cnt = 1;
                                     while ($row = $result->fetch_assoc()) {
-                                    ?>
-                                    <tr>
-                                        <td><?php echo $cnt++; ?></td>
-                                        <td><?php echo $row['vehicleType']; ?></td>
-                                        <td><?php echo $row['vehicleBrand']; ?></td>
-                                        <td><?php echo $row['vehicleColour']; ?></td>
-                                        <td><?php echo $row['vehiclePlateNum']; ?></td>
-                                        <td>
-                                            <a href="student-view-vehicle.php?vehiclePlateNum=<?php echo $row['vehiclePlateNum']; ?>" class="badge bg-primary text-white">View</a>
-                                            <a href="student-edit-vehicle.php?vehiclePlateNum=<?php echo $row['vehiclePlateNum']; ?>" class="badge bg-success text-white">Edit</a>
-                                            <a href="student-manage-vehicle.php?del=<?php echo $row['vehiclePlateNum']; ?>" class="badge bg-danger text-white" onclick="return confirm('Are you sure you want to delete this vehicle?');">Delete</a>
-                                        </td>
-                                    </tr>
-                                    <?php
+                                        echo "<tr>";
+                                        echo "<td>" . $cnt . "</td>";
+                                        echo "<td>" . $row['vehicleType'] . "</td>";
+                                        echo "<td>" . $row['vehicleBrand'] . "</td>";
+                                        echo "<td>" . $row['vehicleColour'] . "</td>";
+                                        echo "<td>" . $row['vehiclePlateNum'] . "</td>";
+                                        echo "<td>" . ucfirst($row['status']) . "</td>";
+                                        echo "<td><a href='student-manage-vehicles.php?del=" . $row['vehiclePlateNum'] . "' onclick='return confirm(\"Are you sure you want to delete this vehicle?\");'><i class='fas fa-trash'></i> Delete</a></td>";
+                                        echo "</tr>";
+                                        $cnt++;
                                     }
                                     ?>
                                 </tbody>
                             </table>
                         </div>
                     </div>
-                    <div class="card-footer small text-muted">
-                        <?php
-                        date_default_timezone_set("Asia/Kuala_Lumpur");
-                        echo "Generated : " . date("h:i:sa");
-                        ?>
-                    </div>
                 </div>
             </div>
         </div>
     </div>
-    <!-- /.container-fluid -->
 
-    <!-- Footer -->
+    <!-- Include footer and scripts -->
     <?php
-    // Include footer
     include('includes/footer.php');
+    include('includes/scripts.php');
     ?>
+
 </div>
-<!-- /.content-wrapper -->
-
-<?php
-// Include scripts
-include('includes/scripts.php');
-?>
-
-<!-- Custom CSS to ensure proper table layout -->
-<style>
-.table-responsive table {
-    table-layout: auto; /* Adjusted to auto for better column width management */
-    width: 100%;
-}
-.table-responsive th, .table-responsive td {
-    word-wrap: break-word;
-}
-.table th, .table td {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-</style>

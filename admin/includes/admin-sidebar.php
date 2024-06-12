@@ -34,7 +34,6 @@
                 </a>
                 <div class="collapse" id="collapseVehicle" aria-labelledby="headingVehicle" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" href="admin-add-vehicle.php">Vehicle Registration</a>
                         <a class="nav-link" href="admin-manage-vehicle.php">Manage Vehicle</a>
                     </nav>
                 </div>

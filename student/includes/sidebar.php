@@ -21,6 +21,7 @@
                 </a>
                 <div class="collapse" id="collapseVehicle" aria-labelledby="headingVehicle" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
+                        <a class="nav-link" href="student-add-vehicle.php">Register Vehicle</a>
                         <a class="nav-link" href="student-manage-vehicle.php">List of Vehicle</a>
                     </nav>
                 </div>
