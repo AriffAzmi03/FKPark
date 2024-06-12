@@ -7,6 +7,8 @@ include('includes/header.php');
 // Include database connection file
 include('includes/dbconnection.php');
 
+include('../phpqrcode/qrlib.php');
+
 // Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_parking_space'])) {
     // Get form data
@@ -23,6 +25,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_parking_space'])) 
     $stmt->bind_param("sssss", $parkingID, $parkingArea, $parkingType, $parkingAvailabilityStatus, $parkingAddDetail);
 
     if ($stmt->execute()) {
+        // Prepare the URL for the QR code
+        $parkingLink = "http://localhost/FKPark/admin/admin-view-park.php?parkingID=$parkingID";
+
+        // Create QR Code directory if it does not exist
+        $qrCodeDir = "../imageQR";
+        if (!is_dir($qrCodeDir)) {
+            mkdir($qrCodeDir, 0755, true);
+        }
+
+        // Generate QR Code with the full URL
+        $qrCodeFile = $qrCodeDir . "/parking" . $parkingID . ".png";
+        QRcode::png($parkingLink, $qrCodeFile, QR_ECLEVEL_L, 5);
+
         // Redirect to admin-generate-park.php with the last inserted parkingID
         header("Location: admin-generate-park.php?parkingID=" . $parkingID);
         exit(); // Ensure no further code is executed
@@ -84,7 +99,7 @@ ob_end_flush(); // End output buffering and flush output
                         </div>
                         <div class="form-group mb-3">
                             <label for="parkingAddDetail">Additional Notes</label>
-                            <input type="text" required class="form-control" id="parkingAddDetail" name="parkingAddDetail">
+                            <input type="text" class="form-control" id="parkingAddDetail" name="parkingAddDetail">
                         </div>
                         <button type="submit" name="add_parking_space" class="btn btn-success">Add Parking Space</button>
                     </form>

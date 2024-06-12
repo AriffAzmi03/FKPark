@@ -84,6 +84,7 @@ if (isset($_GET['del'])) {
                                             <td>
                                                 <a href="admin-edit-park.php?u_id=<?php echo $row->parkingID; ?>" class="badge bg-success text-white"><i class="fas fa-user-edit"></i> Update</a>
                                                 <a href="admin-manage-area.php?del=<?php echo $row->parkingID; ?>" class="badge bg-danger text-white" onclick="return confirm('Are you sure you want to delete this parking space?');"><i class="fas fa-trash-alt"></i> Delete</a>
+                                                <a href="admin-view-park.php?parkingID=<?php echo $row->parkingID; ?>" class="badge bg-info text-white"><i class="fas fa-eye"></i> View</a>
                                             </td>
                                         </tr>
                                     <?php

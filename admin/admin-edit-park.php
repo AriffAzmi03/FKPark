@@ -94,7 +94,7 @@ $conn->close();
                         </div>
                         <div class="form-group mb-3">
                             <label for="parkingAddDetail">Additional Notes</label>
-                            <input type="text" class="form-control" id="parkingAddDetail" name="parkingAddDetail" value="<?php echo htmlspecialchars(isset($parking['parkingAddDetail']) ? $parking['parkingAddDetail'] : ''); ?>" required>
+                            <input type="text" class="form-control" id="parkingAddDetail" name="parkingAddDetail" value="<?php echo htmlspecialchars(isset($parking['parkingAddDetail']) ? $parking['parkingAddDetail'] : ''); ?>" >
                         </div>
                         <button type="submit" name="update_parking" class="btn btn-success">Update</button>
                         <a href="admin-manage-area.php" class="btn btn-secondary">Back</a>
