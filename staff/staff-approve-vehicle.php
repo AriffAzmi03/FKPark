@@ -78,7 +78,7 @@ $result = $conn->query($query);
                                     <td><?php echo $row['studentName']; ?></td>
                                     <td><?php echo $row['studentID']; ?></td>
                                     <td>
-                                        <a href="admin-view-grant.php?vehiclePlateNum=<?php echo $row['vehiclePlateNum']; ?>" class="btn btn-info btn-sm">View Grant</a>
+                                        <a href="view-grant.php?vehiclePlateNum=<?php echo $row['vehiclePlateNum']; ?>" class="btn btn-info btn-sm">View Grant</a>
                                     </td>
                                     <td>
                                         <form method="POST" style="display:inline;">

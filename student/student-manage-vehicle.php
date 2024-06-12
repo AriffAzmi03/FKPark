@@ -95,7 +95,13 @@ $result = $stmt->get_result();
                                         echo "<td>" . $row['vehicleColour'] . "</td>";
                                         echo "<td>" . $row['vehiclePlateNum'] . "</td>";
                                         echo "<td>" . ucfirst($row['status']) . "</td>";
-                                        echo "<td><a href='student-manage-vehicles.php?del=" . $row['vehiclePlateNum'] . "' onclick='return confirm(\"Are you sure you want to delete this vehicle?\");'><i class='fas fa-trash'></i> Delete</a></td>";
+                                        echo "<td>";
+                                        if (strtolower($row['status']) == 'approved') {
+                                            echo " | <a href='student-view-vehicle.php?plateNum=" . $row['vehiclePlateNum'] . "'><i class='fas fa-eye'></i> View</a>";
+                                            echo " | <a href='student-edit-vehicle.php?plateNum=" . $row['vehiclePlateNum'] . "'><i class='fas fa-edit'></i> Edit</a>";
+                                        }
+                                        echo "<a href='student-manage-vehicle.php?del=" . $row['vehiclePlateNum'] . "' onclick='return confirm(\"Are you sure you want to delete this vehicle?\");'><i class='fas fa-trash'></i> Delete</a>";
+                                        echo "</td>";
                                         echo "</tr>";
                                         $cnt++;
                                     }
