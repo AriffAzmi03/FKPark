@@ -1,9 +1,21 @@
 <?php
+// Start the session
+session_start();
+
+// Check if the student is logged in
+if (!isset($_SESSION['studentID'])) {
+    header("Location: student-login.php");
+    exit();
+}
+
 // Include header file
 include('includes/header.php');
 
 // Include database connection file
 include('includes/dbconnection.php');
+
+// Get the student ID from the session
+$studentID = $_SESSION['studentID'];
 
 // Handle delete request
 if (isset($_GET['del'])) {

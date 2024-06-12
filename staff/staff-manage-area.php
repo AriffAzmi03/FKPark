@@ -21,6 +21,15 @@ if (isset($_GET['del'])) {
     // Close the statement
     $stmt->close();
 }
+
+// Handle search request
+$searchQuery = "";
+if (isset($_GET['search'])) {
+    $searchTerm = $_GET['search'];
+    $searchQuery = "WHERE parkingID LIKE ? OR parkingArea LIKE ? OR parkingType LIKE ?";
+    $searchTerm = "%$searchTerm%";
+}
+
 ?>
 
 <div id="content-wrapper">
@@ -41,9 +50,15 @@ if (isset($_GET['del'])) {
         <div class="row justify-content-center">
             <div class="col-md-12">
                 <div class="card mb-4">
-                    <div class="card-header">
-                        <i class="fas fa-parking"></i>
-                        Parking Spaces
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-parking"></i>
+                            Parking Spaces
+                        </div>
+                        <form class="form-inline" method="get" action="">
+                            <input class="form-control mr-sm-2" type="search" placeholder="Search" name="search" aria-label="Search">
+                            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                        </form>
                     </div>
                     <div class="card-body">
                         <?php
@@ -67,8 +82,13 @@ if (isset($_GET['del'])) {
                                 </thead>
                                 <tbody>
                                     <?php
-                                    $ret = "SELECT * FROM parkingspace ORDER BY parkingCreatedAt DESC LIMIT 1000";
+                                    $ret = "SELECT * FROM parkingspace $searchQuery ORDER BY parkingCreatedAt DESC LIMIT 1000";
                                     $stmt = $conn->prepare($ret);
+                                    
+                                    if (isset($_GET['search'])) {
+                                        $stmt->bind_param("sss", $searchTerm, $searchTerm, $searchTerm);
+                                    }
+                                    
                                     $stmt->execute();
                                     $res = $stmt->get_result();
                                     $cnt = 1;
