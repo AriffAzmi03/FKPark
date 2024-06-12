@@ -25,11 +25,8 @@ if (isset($_GET['del'])) {
 // Handle search request
 $searchQuery = "";
 if (isset($_GET['search'])) {
-    $searchTerm = $_GET['search'];
-    $searchQuery = "WHERE parkingID LIKE ? OR parkingArea LIKE ? OR parkingType LIKE ?";
-    $searchTerm = "%$searchTerm%";
+    $searchQuery = $_GET['search'];
 }
-
 ?>
 
 <div id="content-wrapper">
@@ -55,9 +52,9 @@ if (isset($_GET['search'])) {
                             <i class="fas fa-parking"></i>
                             Parking Spaces
                         </div>
-                        <form class="form-inline" method="get" action="">
-                            <input class="form-control mr-sm-2" type="search" placeholder="Search" name="search" aria-label="Search">
-                            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                        <form class="form-inline d-flex" method="get" action="">
+                            <input class="form-control mr-2" type="search" placeholder="Search" aria-label="Search" name="search" value="<?php echo htmlspecialchars($searchQuery); ?>">
+                            <button class="btn btn-outline-success" type="submit">Search</button>
                         </form>
                     </div>
                     <div class="card-body">
@@ -82,13 +79,17 @@ if (isset($_GET['search'])) {
                                 </thead>
                                 <tbody>
                                     <?php
-                                    $ret = "SELECT * FROM parkingspace $searchQuery ORDER BY parkingCreatedAt DESC LIMIT 1000";
-                                    $stmt = $conn->prepare($ret);
-                                    
-                                    if (isset($_GET['search'])) {
-                                        $stmt->bind_param("sss", $searchTerm, $searchTerm, $searchTerm);
+                                    $query = "SELECT * FROM parkingspace";
+                                    if (!empty($searchQuery)) {
+                                        $query .= " WHERE parkingID LIKE ? OR parkingArea LIKE ? OR parkingType LIKE ?";
                                     }
+                                    $query .= " ORDER BY parkingCreatedAt DESC LIMIT 1000";
                                     
+                                    $stmt = $conn->prepare($query);
+                                    if (!empty($searchQuery)) {
+                                        $searchParam = "%" . $searchQuery . "%";
+                                        $stmt->bind_param("sss", $searchParam, $searchParam, $searchParam);
+                                    }
                                     $stmt->execute();
                                     $res = $stmt->get_result();
                                     $cnt = 1;

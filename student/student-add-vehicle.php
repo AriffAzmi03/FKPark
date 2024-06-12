@@ -2,6 +2,8 @@
 // Start the session
 session_start();
 
+ob_start(); // Start output buffering
+
 // Check if the student is logged in
 if (!isset($_SESSION['studentID'])) {
     header("Location: student-login.php");
@@ -16,6 +18,8 @@ include('includes/dbconnection.php');
 
 // Get the student ID from the session
 $studentID = $_SESSION['studentID'];
+
+include('../phpqrcode/qrlib.php');
 
 // Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_vehicle'])) {
@@ -47,6 +51,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_vehicle'])) {
 
     if ($stmt->execute()) {
         echo "<div class='alert alert-success' role='alert'>New vehicle added successfully!</div>";
+    } else {
+        echo "<div class='alert alert-danger' role='alert'>Error: " . $stmt->error . "</div>";
+    }
+
+
+    if ($stmt->execute()) {
+        // Prepare the URL for the QR code
+        $vehicleLink = "http://localhost/FKPark/admin/admin-view-vehicle.php?parkingID=$parkingID";
+
+        // Create QR Code directory if it does not exist
+        $qrCodeDir = "../imageQR";
+        if (!is_dir($qrCodeDir)) {
+            mkdir($qrCodeDir, 0755, true);
+        }
+
+        // Generate QR Code with the full URL
+        $qrCodeFile = $qrCodeDir . "/parking" . $parkingID . ".png";
+        QRcode::png($parkingLink, $qrCodeFile, QR_ECLEVEL_L, 5);
+
+        // Redirect to admin-generate-park.php with the last inserted parkingID
+        header("Location: admin-view-vehicle.php?parkingID=" . $parkingID);
+        exit(); // Ensure no further code is executed
     } else {
         echo "<div class='alert alert-danger' role='alert'>Error: " . $stmt->error . "</div>";
     }
