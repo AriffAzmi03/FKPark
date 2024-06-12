@@ -21,6 +21,15 @@ if (isset($_GET['del'])) {
     // Close the statement
     $stmt->close();
 }
+
+// Handle search request
+$searchQuery = "";
+if (isset($_GET['search'])) {
+    $searchTerm = $_GET['search'];
+    $searchQuery = "WHERE parkingID LIKE ? OR parkingArea LIKE ? OR parkingType LIKE ?";
+    $searchTerm = "%$searchTerm%";
+}
+
 ?>
 
 <div id="content-wrapper">
@@ -32,7 +41,7 @@ if (isset($_GET['del'])) {
                     <li class="breadcrumb-item">
                         <a href="#">Parking</a>
                     </li>
-                    <li class="breadcrumb-item active">Manage Parking Spaces</li>
+                    <li class="breadcrumb-item active">View Parking Spaces</li>
                 </ol>
             </div>
         </div>
@@ -41,9 +50,15 @@ if (isset($_GET['del'])) {
         <div class="row justify-content-center">
             <div class="col-md-12">
                 <div class="card mb-4">
-                    <div class="card-header">
-                        <i class="fas fa-parking"></i>
-                        Parking Spaces
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-parking"></i>
+                            Parking Spaces
+                        </div>
+                        <form class="form-inline" method="get" action="">
+                            <input class="form-control mr-sm-2" type="search" placeholder="Search" name="search" aria-label="Search">
+                            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                        </form>
                     </div>
                     <div class="card-body">
                         <?php
@@ -67,8 +82,13 @@ if (isset($_GET['del'])) {
                                 </thead>
                                 <tbody>
                                     <?php
-                                    $ret = "SELECT * FROM parkingspace ORDER BY parkingCreatedAt DESC LIMIT 1000";
+                                    $ret = "SELECT * FROM parkingspace $searchQuery ORDER BY parkingCreatedAt DESC LIMIT 1000";
                                     $stmt = $conn->prepare($ret);
+                                    
+                                    if (isset($_GET['search'])) {
+                                        $stmt->bind_param("sss", $searchTerm, $searchTerm, $searchTerm);
+                                    }
+                                    
                                     $stmt->execute();
                                     $res = $stmt->get_result();
                                     $cnt = 1;
@@ -82,9 +102,7 @@ if (isset($_GET['del'])) {
                                             <td><?php echo htmlspecialchars($row->parkingAvailabilityStatus); ?></td>
                                             <td><?php echo htmlspecialchars(isset($row->parkingAddDetail) ? $row->parkingAddDetail : ''); ?></td>
                                             <td>
-                                                <a href="admin-edit-park.php?u_id=<?php echo $row->parkingID; ?>" class="badge bg-success text-white"><i class="fas fa-user-edit"></i> Update</a>
-                                                <a href="admin-manage-area.php?del=<?php echo $row->parkingID; ?>" class="badge bg-danger text-white" onclick="return confirm('Are you sure you want to delete this parking space?');"><i class="fas fa-trash-alt"></i> Delete</a>
-                                                <a href="admin-view-park.php?parkingID=<?php echo $row->parkingID; ?>" class="badge bg-info text-white"><i class="fas fa-eye"></i> View</a>
+                                                <a href="staff-view-park.php?parkingID=<?php echo $row->parkingID; ?>" class="badge bg-info text-white"><i class="fas fa-eye"></i> View</a>
                                             </td>
                                         </tr>
                                     <?php
