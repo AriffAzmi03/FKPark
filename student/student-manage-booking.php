@@ -1,21 +1,95 @@
 <?php
+session_start(); // Start the session
+
+// Check if studentID session variable is not set
+if (!isset($_SESSION['studentID'])) {
+    // Redirect to the login page
+    header("Location: student-login.php");
+    exit(); // Terminate the script
+}
+
 // Include header file
 include('includes/header.php');
 
 // Include database connection file
 include('includes/dbconnection.php');
 
+// Function to delete expired bookings
+function deleteExpiredBookings($conn) {
+    $currentDateTime = date('Y-m-d H:i:s');
+    
+    // Start a transaction
+    $conn->begin_transaction();
+    try {
+        // Get the list of expired bookings
+        $query = "SELECT bookingID FROM booking WHERE bookingEnd < ?";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("s", $currentDateTime);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        while ($row = $result->fetch_assoc()) {
+            // Delete the expired booking
+            $delQuery = "DELETE FROM booking WHERE bookingID = ?";
+            $stmtDel = $conn->prepare($delQuery);
+            $stmtDel->bind_param("s", $row['bookingID']);
+            if (!$stmtDel->execute()) {
+                throw new Exception($stmtDel->error);
+            }
+        }
+
+        // Commit the transaction
+        $conn->commit();
+    } catch (Exception $e) {
+        // Rollback the transaction if something went wrong
+        $conn->rollback();
+        echo "<div class='alert alert-danger' role='alert'>Error: " . $e->getMessage() . "</div>";
+    }
+
+    // Close the statement
+    $stmt->close();
+}
+
+// Call the function to delete expired bookings
+deleteExpiredBookings($conn);
+
 // Handle delete request
 if (isset($_GET['del_start'])) {
     $bookingStart = $_GET['del_start'];
-    $delQuery = "DELETE FROM booking WHERE bookingStart = ? ";
-    $stmt = $conn->prepare($delQuery);
-    $stmt->bind_param("s", $bookingStart );
-    
-    if ($stmt->execute()) {
+    $studentID = $_SESSION['studentID'];
+
+    // Start a transaction
+    $conn->begin_transaction();
+
+    try {
+        // Get the parkingID from the booking to be deleted
+        $query = "SELECT parkingID FROM booking WHERE bookingStart = ? AND studentID = ?";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("ss", $bookingStart, $studentID);
+        $stmt->execute();
+        $stmt->bind_result($parkingID);
+        $stmt->fetch();
+        $stmt->close();
+
+        if (!$parkingID) {
+            throw new Exception("Booking not found or you don't have permission to delete this booking.");
+        }
+
+        // Delete the booking
+        $delQuery = "DELETE FROM booking WHERE bookingStart = ? AND studentID = ?";
+        $stmt = $conn->prepare($delQuery);
+        $stmt->bind_param("ss", $bookingStart, $studentID);
+        if (!$stmt->execute()) {
+            throw new Exception($stmt->error);
+        }
+
+        // Commit the transaction
+        $conn->commit();
         $deleteMessage = "<div class='alert alert-success' role='alert'>Booking deleted successfully!</div>";
-    } else {
-        $deleteMessage = "<div class='alert alert-danger' role='alert'>Error: " . $stmt->error . "</div>";
+    } catch (Exception $e) {
+        // Rollback the transaction if something went wrong
+        $conn->rollback();
+        $deleteMessage = "<div class='alert alert-danger' role='alert'>Error: " . $e->getMessage() . "</div>";
     }
 
     // Close the statement
@@ -66,8 +140,10 @@ if (isset($_GET['del_start'])) {
                                 </thead>
                                 <tbody>
                                     <?php
-                                    $ret = "SELECT * FROM booking ORDER BY bookingDate DESC";
+                                    $studentID = $_SESSION['studentID'];
+                                    $ret = "SELECT * FROM booking WHERE studentID = ? ORDER BY bookingDate DESC";
                                     $stmt = $conn->prepare($ret);
+                                    $stmt->bind_param("s", $studentID);
                                     $stmt->execute();
                                     $res = $stmt->get_result();
                                     $cnt = 1;
@@ -84,7 +160,7 @@ if (isset($_GET['del_start'])) {
                                             </td>
                                         </tr>
                                     <?php
-                                        $cnt = $cnt + 1;
+                                        $cnt++;
                                     }
                                     ?>
                                 </tbody>
@@ -115,19 +191,3 @@ if (isset($_GET['del_start'])) {
 // Include scripts
 include('includes/scripts.php');
 ?>
-
-<!-- Custom CSS to ensure proper table layout -->
-<style>
-    .table-responsive table {
-        table-layout: auto; /* Adjusted to auto for better column width management */
-        width: 100%;
-    }
-    .table-responsive th, .table-responsive td {
-        word-wrap: break-word;
-    }
-    .table th, .table td {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-</style>

@@ -24,12 +24,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['vehiclePlateNum'])) {
     $stmt->close();
 }
 
-// Retrieve pending vehicles
-$query = "SELECT vehiclePlateNum, vehicleType, vehicleBrand, vehicleColour, studentID FROM vehicle WHERE status = 'pending'";
+// Retrieve pending vehicles with student details
+$query = "SELECT vehicle.vehiclePlateNum, vehicle.vehicleType, vehicle.vehicleBrand, vehicle.vehicleColour, 
+                  vehicle.studentID, student.studentName 
+          FROM vehicle 
+          JOIN student ON vehicle.studentID = student.studentID 
+          WHERE vehicle.status = 'pending'";
 $result = $conn->query($query);
 ?>
 
-<div class="container mt-4">
+<div class="container-fluid mt-4">
     <ol class="breadcrumb">
         <li class="breadcrumb-item">
             <a href="#">Vehicles</a>
@@ -38,7 +42,7 @@ $result = $conn->query($query);
     </ol>
     <hr>
     <div class="row justify-content-center">
-        <div class="col-md-10">
+        <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
                     Pending Vehicle Approvals
@@ -54,7 +58,9 @@ $result = $conn->query($query);
                                     <th>Vehicle Brand</th>
                                     <th>Vehicle Colour</th>
                                     <th>Vehicle Plate Number</th>
+                                    <th>Student Name</th>
                                     <th>Student ID</th>
+                                    <th>Grant</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -69,7 +75,11 @@ $result = $conn->query($query);
                                     <td><?php echo $row['vehicleBrand']; ?></td>
                                     <td><?php echo $row['vehicleColour']; ?></td>
                                     <td><?php echo $row['vehiclePlateNum']; ?></td>
+                                    <td><?php echo $row['studentName']; ?></td>
                                     <td><?php echo $row['studentID']; ?></td>
+                                    <td>
+                                        <a href="admin-view-grant.php?vehiclePlateNum=<?php echo $row['vehiclePlateNum']; ?>" class="btn btn-info btn-sm">View Grant</a>
+                                    </td>
                                     <td>
                                         <form method="POST" style="display:inline;">
                                             <input type="hidden" name="vehiclePlateNum" value="<?php echo $row['vehiclePlateNum']; ?>">

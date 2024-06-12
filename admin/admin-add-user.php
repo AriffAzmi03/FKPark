@@ -7,7 +7,7 @@ include('includes/dbconnection.php');
 
 // Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_user'])) {
-    // Get form data
+    // Get form data from POST request
     $studentName = $_POST['studentName'];
     $studentID = $_POST['studentID'];
     $studentPhoneNum = $_POST['studentPhoneNum'];
@@ -23,6 +23,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_user'])) {
     $stmt = $conn->prepare($query);
     $stmt->bind_param("ssssssss", $studentName, $studentID, $studentPhoneNum, $studentAddress, $studentType, $studentYear, $studentEmail, $studentPassword);
 
+    // Check if the query executed successfully
     if ($stmt->execute()) {
         echo "<div class='alert alert-success' role='alert'>New user added successfully!</div>";
     } else {
@@ -38,7 +39,7 @@ $conn->close();
 ?>
 
 <div class="container mt-4">
-    <!-- Breadcrumbs-->
+    <!-- Breadcrumbs -->
     <ol class="breadcrumb">
         <li class="breadcrumb-item">
             <a href="#">Users</a>
@@ -55,22 +56,27 @@ $conn->close();
                 <div class="card-body">
                     <!-- Add User Form -->
                     <form method="POST">
+                        <!-- Full Name Field -->
                         <div class="form-group mb-3">
                             <label for="studentName">Full Name</label>
                             <input type="text" required class="form-control" id="studentName" name="studentName">
                         </div>
+                        <!-- Student ID Field -->
                         <div class="form-group mb-3">
                             <label for="studentID">Student ID</label>
                             <input type="text" class="form-control" id="studentID" name="studentID">
                         </div>
+                        <!-- Phone Number Field -->
                         <div class="form-group mb-3">
                             <label for="studentPhoneNum">Phone Number</label>
                             <input type="tel" class="form-control" id="studentPhoneNum" name="studentPhoneNum">
                         </div>
+                        <!-- Address Field -->
                         <div class="form-group mb-3">
                             <label for="studentAddress">Address</label>
                             <input type="text" class="form-control" id="studentAddress" name="studentAddress">
                         </div>
+                        <!-- Level of Study Field -->
                         <div class="form-group mb-3">
                             <label for="studentType">Level Of Study</label>
                             <select class="form-control" id="studentType" name="studentType" required>
@@ -78,20 +84,24 @@ $conn->close();
                                 <option value="Postgraduate">Postgraduate</option>
                             </select>
                         </div>
+                        <!-- Year of Study Field -->
                         <div class="form-group mb-3">
                             <label for="studentYear">Year Of Study</label>
                             <input type="number" class="form-control" id="studentYear" name="studentYear">
                         </div>
+                        <!-- Email Field -->
                         <div class="form-group mb-3">
                             <label for="studentEmail">Email</label>
                             <input type="email" class="form-control" id="studentEmail" name="studentEmail">
                         </div>
+                        <!-- Password Field -->
                         <div class="form-group mb-3">
                             <label for="studentPassword">Password</label>
                             <input type="password" class="form-control" id="studentPassword" name="studentPassword">
                         </div>
-                        <button type="submit" name="add_user" class="btn btn-success">Add User</button>
-                        <button type="reset" class="btn btn-secondary">Reset</button>
+                        <!-- Submit and Reset Buttons -->
+                        <button type="submit" name="add_user" class="btn btn-primary">Add User</button>
+                        <button type="reset" class="btn btn-light">Reset</button>
                     </form>
                     <!-- End Form -->
                 </div>
@@ -107,5 +117,3 @@ $conn->close();
 include('includes/footer.php');
 include('includes/scripts.php');
 ?>
-
-

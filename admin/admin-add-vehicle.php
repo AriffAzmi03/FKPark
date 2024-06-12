@@ -66,7 +66,7 @@ $conn->close();
 ?>
 
 <div class="container mt-4">
-    <!-- Breadcrumbs-->
+    <!-- Breadcrumbs -->
     <ol class="breadcrumb">
         <li class="breadcrumb-item">
             <a href="#">Vehicles</a>
@@ -83,6 +83,7 @@ $conn->close();
                 <div class="card-body">
                     <!-- Add Vehicle Form -->
                     <form id="vehicleForm" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
+                        <!-- Vehicle Type Field -->
                         <div class="form-group mb-3">
                             <label for="vehicleType">Vehicle Type</label>
                             <select class="form-control" id="vehicleType" name="vehicleType" required>
@@ -91,23 +92,28 @@ $conn->close();
                                 <option value="Motorcycle">Motorcycle</option>
                             </select>
                         </div>
+                        <!-- Vehicle Brand Field -->
                         <div class="form-group mb-3">
                             <label for="vehicleBrand">Vehicle Brand</label>
                             <input type="text" required class="form-control" id="vehicleBrand" name="vehicleBrand">
                         </div>
+                        <!-- Vehicle Colour Field -->
                         <div class="form-group mb-3">
                             <label for="vehicleColour">Vehicle Colour</label>
                             <input type="text" required class="form-control" id="vehicleColour" name="vehicleColour">
                         </div>
+                        <!-- Vehicle Plate Number Field -->
                         <div class="form-group mb-3">
                             <label for="vehiclePlateNum">Vehicle Plate Number</label>
                             <input type="text" required class="form-control" id="vehiclePlateNum" name="vehiclePlateNum">
                         </div>
+                        <!-- Student Field -->
                         <div class="form-group mb-3">
                             <label for="studentID">Student</label>
                             <select class="form-control" id="studentID" name="studentID" required>
                                 <option value="">Select Student</option>
                                 <?php
+                                // Populate student dropdown
                                 if ($students_result->num_rows > 0) {
                                     while($student = $students_result->fetch_assoc()) {
                                         echo "<option value='{$student['studentID']}'>{$student['studentName']} ({$student['studentID']})</option>";
@@ -116,12 +122,14 @@ $conn->close();
                                 ?>
                             </select>
                         </div>
+                        <!-- Vehicle Grant Field -->
                         <div class="form-group mb-3">
                             <label for="vehicleGrant">Vehicle Grant</label>
                             <input type="file" class="form-control" id="vehicleGrant" name="vehicleGrant" accept=".pdf, image/jpeg, image/png" required>
                         </div>
-                        <button type="submit" name="add_vehicle" class="btn btn-success">Add Vehicle</button>
-                        <button type="reset" class="btn btn-secondary">Reset</button>
+                        <!-- Submit and Reset Buttons -->
+                        <button type="submit" name="add_vehicle" class="btn btn-primary">Add Vehicle</button>
+                        <button type="reset" class="btn btn-light">Reset</button>
                     </form>
                     <!-- End Form -->
                 </div>
@@ -138,6 +146,7 @@ include('includes/footer.php');
 include('includes/scripts.php');
 ?>
 
+<!-- Form Validation Script -->
 <script>
 function validateForm() {
     var vehicleType = document.getElementById('vehicleType').value;
@@ -147,6 +156,7 @@ function validateForm() {
     var vehicleGrant = document.getElementById('vehicleGrant').files[0];
     var studentID = document.getElementById('studentID').value;
 
+    // Check if all required fields are filled
     if (!vehicleType || !vehicleBrand || !vehicleColour || !vehiclePlateNum || !vehicleGrant || !studentID) {
         alert('Please fill in all the required fields.');
         return false;
