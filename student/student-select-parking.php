@@ -1,4 +1,14 @@
 <?php
+session_start(); // Start the session
+ob_start(); // Start output buffering
+
+// Check if studentID session variable is not set
+if (!isset($_SESSION['studentID'])) {
+    // Redirect to the login page
+    header("Location: student-login.php");
+    exit(); // Terminate the script
+}
+
 // Include header file
 include('includes/header.php');
 
@@ -147,20 +157,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <?php
 // Include scripts
 include('includes/scripts.php');
-?>
 
-<!-- Custom CSS to ensure proper table layout -->
-<style>
-    .table-responsive table {
-        table-layout: auto; /* Adjusted to auto for better column width management */
-        width: 100%;
-    }
-    .table-responsive th, .table-responsive td {
-        word-wrap: break-word;
-    }
-    .table th, .table td {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-</style>
+ob_end_flush(); // Flush the buffer and send output to the browser
+?>

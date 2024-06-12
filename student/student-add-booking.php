@@ -1,9 +1,31 @@
 <?php
+session_start(); // Start the session
+ob_start(); // Start output buffering
+
+// Check if studentID session variable is not set
+if (!isset($_SESSION['studentID'])) {
+    // Redirect to the login page
+    header("Location: student-login.php");
+    exit(); // Terminate the script
+}
+
 // Include header file
 include('includes/header.php');
+include('includes/sidebar.php'); // Include sidebar file
 
 // Include database connection file
 include('includes/dbconnection.php');
+
+// Function to generate a random booking ID (varchar 10)
+function generateRandomBookingID($length = 10) {
+    $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $charactersLength = strlen($characters);
+    $randomString = '';
+    for ($i = 0; $i < $length; $i++) {
+        $randomString .= $characters[rand(0, $charactersLength - 1)];
+    }
+    return $randomString;
+}
 
 // Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirm_booking'])) {
@@ -12,28 +34,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirm_booking'])) {
     $bookingDate = $_POST['bookingDate'];
     $bookingStart = $_POST['bookingStart'];
     $bookingEnd = $_POST['bookingEnd'];
+    $studentID = $_SESSION['studentID']; // Get the studentID from the session
+
+    // Generate random booking ID
+    $bookingID = generateRandomBookingID();
 
     // Start a transaction
     $conn->begin_transaction();
 
     try {
         // Insert into booking table
-        $query = "INSERT INTO booking (parkingID, bookingDate, bookingStart, bookingEnd)
-                  VALUES (?, ?, ?, ?)";
+        $query = "INSERT INTO booking (bookingID, parkingID, bookingDate, bookingStart, bookingEnd, studentID)
+                  VALUES (?, ?, ?, ?, ?, ?)";
         $stmt = $conn->prepare($query);
-        $stmt->bind_param("ssss", $parkingID, $bookingDate, $bookingStart, $bookingEnd);
+        $stmt->bind_param("ssssss", $bookingID, $parkingID, $bookingDate, $bookingStart, $bookingEnd, $studentID);
         if (!$stmt->execute()) {
             throw new Exception($stmt->error);
         }
 
-        // Update parking space status
-        $updateQuery = "UPDATE parkingspace SET parkingAvailabilityStatus = 'Occupied' WHERE parkingID = ?";
-        $stmt = $conn->prepare($updateQuery);
-        $stmt->bind_param("s", $parkingID);
-        if (!$stmt->execute()) {
-            throw new Exception($stmt->error);
-        }
-
+      
         // Commit transaction
         $conn->commit();
         echo "<div class='alert alert-success' role='alert'>Parking space booked successfully!</div>";
@@ -47,7 +66,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirm_booking'])) {
     $stmt->close();
     // Redirect to manage booking page
     header("Location: student-manage-booking.php");
-    exit();
+    ob_end_flush(); // Flush the buffer and send output to the browser
+    exit(); // Terminate the script
 }
 
 // Get data from URL
@@ -109,20 +129,6 @@ $bookingEnd = $_GET['bookingEnd'];
 // Include footer and scripts
 include('includes/footer.php');
 include('includes/scripts.php');
-?>
 
-<!-- Custom CSS to ensure proper table layout -->
-<style>
-    .table-responsive table {
-        table-layout: auto; /* Adjusted to auto for better column width management */
-        width: 100%;
-    }
-    .table-responsive th, .table-responsive td {
-        word-wrap: break-word;
-    }
-    .table th, .table td {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-</style>
+ob_end_flush(); // Flush the buffer and send output to the browser
+?>
