@@ -33,6 +33,12 @@ if (isset($_GET['del'])) {
     // Close the statement
     $stmt->close();
 }
+
+// Handle search request
+$searchQuery = "";
+if (isset($_GET['search'])) {
+    $searchQuery = $_GET['search'];
+}
 ?>
 
 <div id="content-wrapper">
@@ -53,9 +59,15 @@ if (isset($_GET['del'])) {
         <div class="row justify-content-center">
             <div class="col-md-12">
                 <div class="card mb-4">
-                    <div class="card-header">
-                        <i class="fas fa-parking"></i>
-                        Parking Spaces
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-parking"></i>
+                            Parking Spaces
+                        </div>
+                        <form class="form-inline d-flex" method="get" action="">
+                            <input class="form-control mr-2" type="search" placeholder="Search" aria-label="Search" name="search" value="<?php echo htmlspecialchars($searchQuery); ?>">
+                            <button class="btn btn-outline-success" type="submit">Search</button>
+                        </form>
                     </div>
                     <div class="card-body">
                         <?php
@@ -79,8 +91,17 @@ if (isset($_GET['del'])) {
                                 </thead>
                                 <tbody>
                                     <?php
-                                    $ret = "SELECT * FROM parkingspace ORDER BY parkingCreatedAt DESC LIMIT 1000";
-                                    $stmt = $conn->prepare($ret);
+                                    $query = "SELECT * FROM parkingspace";
+                                    if (!empty($searchQuery)) {
+                                        $query .= " WHERE parkingID LIKE ? OR parkingArea LIKE ? OR parkingType LIKE ?";
+                                    }
+                                    $query .= " ORDER BY parkingCreatedAt DESC LIMIT 1000";
+                                    
+                                    $stmt = $conn->prepare($query);
+                                    if (!empty($searchQuery)) {
+                                        $searchParam = "%" . $searchQuery . "%";
+                                        $stmt->bind_param("sss", $searchParam, $searchParam, $searchParam);
+                                    }
                                     $stmt->execute();
                                     $res = $stmt->get_result();
                                     $cnt = 1;
