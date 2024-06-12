@@ -32,7 +32,7 @@ if (isset($_GET['del'])) {
                     <li class="breadcrumb-item">
                         <a href="#">Parking</a>
                     </li>
-                    <li class="breadcrumb-item active">Manage Parking Spaces</li>
+                    <li class="breadcrumb-item active">View Parking Spaces</li>
                 </ol>
             </div>
         </div>
@@ -67,7 +67,7 @@ if (isset($_GET['del'])) {
                                 </thead>
                                 <tbody>
                                     <?php
-                                    $ret = "SELECT * FROM parkingspace ORDER BY RAND() LIMIT 1000";
+                                    $ret = "SELECT * FROM parkingspace ORDER BY parkingCreatedAt DESC LIMIT 1000";
                                     $stmt = $conn->prepare($ret);
                                     $stmt->execute();
                                     $res = $stmt->get_result();
