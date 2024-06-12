@@ -1,13 +1,21 @@
 <?php
+// Start the session
+session_start();
+
+// Check if the student is logged in
+if (!isset($_SESSION['studentID'])) {
+    header("Location: student-login.php");
+    exit();
+}
+
 // Include header file
 include('includes/header.php');
 
 // Include database connection file
 include('includes/dbconnection.php');
 
-// Retrieve students to populate the dropdown
-$students_query = "SELECT studentID, studentName FROM student";
-$students_result = $conn->query($students_query);
+// Get the student ID from the session
+$studentID = $_SESSION['studentID'];
 
 // Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_vehicle'])) {
@@ -16,7 +24,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_vehicle'])) {
     $vehicleBrand = $_POST['vehicleBrand'];
     $vehicleColour = $_POST['vehicleColour'];
     $vehiclePlateNum = $_POST['vehiclePlateNum'];
-    $studentID = $_POST['studentID'];
     $vehicleGrant = null;
 
     // Handle file upload
@@ -32,33 +39,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_vehicle'])) {
         }
     }
 
-    // Check if studentID exists in the student table
-    $check_student_query = "SELECT studentID FROM student WHERE studentID = ?";
-    $stmt_check = $conn->prepare($check_student_query);
-    $stmt_check->bind_param("s", $studentID);
-    $stmt_check->execute();
-    $stmt_check->store_result();
+    // Prepare and execute the insert query
+    $query = "INSERT INTO vehicle (vehicleType, vehicleBrand, vehicleColour, vehiclePlateNum, vehicleGrant, studentID, status)
+              VALUES (?, ?, ?, ?, ?, ?, 'pending')";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("ssssss", $vehicleType, $vehicleBrand, $vehicleColour, $vehiclePlateNum, $vehicleGrant, $studentID);
 
-    if ($stmt_check->num_rows > 0) {
-        // Prepare and execute the insert query
-        $query = "INSERT INTO vehicle (vehicleType, vehicleBrand, vehicleColour, vehiclePlateNum, vehicleGrant, studentID, status)
-                  VALUES (?, ?, ?, ?, ?, ?, 'pending')";
-        $stmt = $conn->prepare($query);
-        $stmt->bind_param("ssssss", $vehicleType, $vehicleBrand, $vehicleColour, $vehiclePlateNum, $vehicleGrant, $studentID);
-
-        if ($stmt->execute()) {
-            echo "<div class='alert alert-success' role='alert'>New vehicle added successfully!</div>";
-        } else {
-            echo "<div class='alert alert-danger' role='alert'>Error: " . $stmt->error . "</div>";
-        }
-
-        // Close the statement
-        $stmt->close();
+    if ($stmt->execute()) {
+        echo "<div class='alert alert-success' role='alert'>New vehicle added successfully!</div>";
     } else {
-        echo "<div class='alert alert-danger' role='alert'>Error: Invalid student ID.</div>";
+        echo "<div class='alert alert-danger' role='alert'>Error: " . $stmt->error . "</div>";
     }
 
-    $stmt_check->close();
+    // Close the statement
+    $stmt->close();
 }
 
 // Close the database connection
@@ -107,21 +101,6 @@ $conn->close();
                             <label for="vehiclePlateNum">Vehicle Plate Number</label>
                             <input type="text" required class="form-control" id="vehiclePlateNum" name="vehiclePlateNum">
                         </div>
-                        <!-- Student Field -->
-                        <div class="form-group mb-3">
-                            <label for="studentID">Student</label>
-                            <select class="form-control" id="studentID" name="studentID" required>
-                                <option value="">Select Student</option>
-                                <?php
-                                // Populate student dropdown
-                                if ($students_result->num_rows > 0) {
-                                    while($student = $students_result->fetch_assoc()) {
-                                        echo "<option value='{$student['studentID']}'>{$student['studentName']} ({$student['studentID']})</option>";
-                                    }
-                                }
-                                ?>
-                            </select>
-                        </div>
                         <!-- Vehicle Grant Field -->
                         <div class="form-group mb-3">
                             <label for="vehicleGrant">Vehicle Grant</label>
@@ -154,10 +133,9 @@ function validateForm() {
     var vehicleColour = document.getElementById('vehicleColour').value;
     var vehiclePlateNum = document.getElementById('vehiclePlateNum').value;
     var vehicleGrant = document.getElementById('vehicleGrant').files[0];
-    var studentID = document.getElementById('studentID').value;
 
     // Check if all required fields are filled
-    if (!vehicleType || !vehicleBrand || !vehicleColour || !vehiclePlateNum || !vehicleGrant || !studentID) {
+    if (!vehicleType || !vehicleBrand || !vehicleColour || !vehiclePlateNum || !vehicleGrant) {
         alert('Please fill in all the required fields.');
         return false;
     }
