@@ -40,7 +40,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_vehicle'])) {
 
     if ($stmt->execute()) {
         $_SESSION['success_message'] = "Vehicle updated successfully!";
-        header("Location: student-manage-vehicle.php");
+        header("Location: admin-manage-vehicle.php");
         exit();
     } else {
         echo "<div class='alert alert-danger' role='alert'>Error: " . $stmt->error . "</div>";
@@ -61,7 +61,7 @@ include('includes/header.php');
     <!-- Breadcrumbs -->
     <ol class="breadcrumb">
         <li class="breadcrumb-item">
-            <a href="student-manage-vehicle.php">Vehicles</a>
+            <a href="admin-manage-vehicle.php">Vehicles</a>
         </li>
         <li class="breadcrumb-item active">Edit Vehicle</li>
     </ol>
@@ -71,7 +71,7 @@ include('includes/header.php');
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <span>Edit Vehicle</span>
-                    <a href="student-manage-vehicle.php" class="btn btn-secondary">Back</a>
+                    <a href="admin-manage-vehicle.php" class="btn btn-secondary">Back</a>
                 </div>
                 <div class="card-body">
                     <!-- Edit Vehicle Form -->

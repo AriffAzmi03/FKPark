@@ -106,9 +106,8 @@ $result = $stmt->get_result();
                                         <td><?php echo $row['vehiclePlateNum']; ?></td>
                                         <td><?php echo $row['studentName']; ?></td>
                                         <td class='action-column'>
-                                            <a href="admin-view-vehicle.php?plateNum=<?php echo $row['vehiclePlateNum']; ?>" class="btn btn-primary btn-sm mr-1 mb-1"><i class="fas fa-eye"></i> View</a>
-                                            <a href="admin-edit-vehicle.php?plateNum=<?php echo $row['vehiclePlateNum']; ?>" class="btn btn-success btn-sm mr-1 mb-1"><i class="fas fa-edit"></i> Update</a>
-                                            <a href="admin-manage-vehicle.php?del=<?php echo $row['vehiclePlateNum']; ?>" class="btn btn-danger btn-sm mb-1" onclick="return confirm('Are you sure you want to delete this vehicle?');"><i class="fas fa-trash"></i> Delete</a>
+                                            <a href="staff-view-vehicle.php?vehiclePlateNum=<?php echo $row['vehiclePlateNum']; ?>" class="btn btn-primary btn-sm mr-1 mb-1"><i class="fas fa-eye"></i> View</a>
+                                            <a href="staff-manage-vehicle.php?del=<?php echo $row['vehiclePlateNum']; ?>" class="btn btn-danger btn-sm mb-1" onclick="return confirm('Are you sure you want to delete this vehicle?');"><i class="fas fa-trash"></i> Delete</a>
                                         </td>
                                     </tr>
                                     <?php

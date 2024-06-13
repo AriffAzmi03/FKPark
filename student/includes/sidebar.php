@@ -68,7 +68,7 @@
         
         <!-- Sidenav Footer -->
         <div class="sb-sidenav-footer">
-            <div class="small">Logged in as:</div>
+            <div class="small">Logged in as Student:</div>
             <p><?php echo isset($_SESSION['studentName']) ? $_SESSION['studentName'] : 'Student'; ?></p>
         </div>
     </nav>

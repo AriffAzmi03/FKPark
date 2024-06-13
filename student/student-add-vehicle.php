@@ -43,42 +43,57 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_vehicle'])) {
         }
     }
 
-    // Prepare and execute the insert query
-    $query = "INSERT INTO vehicle (vehicleType, vehicleBrand, vehicleColour, vehiclePlateNum, vehicleGrant, studentID, status)
-              VALUES (?, ?, ?, ?, ?, ?, 'pending')";
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("ssssss", $vehicleType, $vehicleBrand, $vehicleColour, $vehiclePlateNum, $vehicleGrant, $studentID);
-
-    if ($stmt->execute()) {
-        echo "<div class='alert alert-success' role='alert'>New vehicle added successfully!</div>";
+    // Check if vehiclePlateNum already exists
+    $checkQuery = "SELECT COUNT(*) FROM vehicle WHERE vehiclePlateNum = ?";
+    if ($checkStmt = $conn->prepare($checkQuery)) {
+        $checkStmt->bind_param("s", $vehiclePlateNum);
+        $checkStmt->execute();
+        $checkStmt->bind_result($count);
+        $checkStmt->fetch();
+        $checkStmt->close();
     } else {
-        echo "<div class='alert alert-danger' role='alert'>Error: " . $stmt->error . "</div>";
+        echo "<div class='alert alert-danger' role='alert'>Error: " . $conn->error . "</div>";
+        exit();
     }
 
+    if ($count > 0) {
+        echo "<div class='alert alert-danger' role='alert'>Error: Vehicle Plate Number already exists.</div>";
+    } else {
+        // Prepare and execute the insert query
+        $query = "INSERT INTO vehicle (vehicleType, vehicleBrand, vehicleColour, vehiclePlateNum, vehicleGrant, studentID, status)
+                  VALUES (?, ?, ?, ?, ?, ?, 'pending')";
+        if ($stmt = $conn->prepare($query)) {
+            $stmt->bind_param("ssssss", $vehicleType, $vehicleBrand, $vehicleColour, $vehiclePlateNum, $vehicleGrant, $studentID);
 
-    if ($stmt->execute()) {
-        // Prepare the URL for the QR code
-        $vehicleLink = "http://localhost/FKPark/admin/admin-view-vehicle.php?parkingID=$parkingID";
+            if ($stmt->execute()) {
+                echo "<div class='alert alert-success' role='alert'>New vehicle added successfully!</div>";
 
-        // Create QR Code directory if it does not exist
-        $qrCodeDir = "../imageQR";
-        if (!is_dir($qrCodeDir)) {
-            mkdir($qrCodeDir, 0755, true);
+                // Prepare the URL for the QR code
+                $vehicleLink = "http://localhost/FKPark/admin/admin-view-vehicle.php?vehiclePlateNum=$vehiclePlateNum";
+
+                // Create QR Code directory if it does not exist
+                $qrCodeDir = "../imageQR";
+                if (!is_dir($qrCodeDir)) {
+                    mkdir($qrCodeDir, 0755, true);
+                }
+
+                // Generate QR Code with the full URL
+                $qrCodeFile = $qrCodeDir . "/vehicle" . $vehiclePlateNum . ".png";
+                QRcode::png($vehicleLink, $qrCodeFile, QR_ECLEVEL_L, 5);
+
+                // Redirect to student-manage-vehicle.php after successful addition
+                header("Location: student-manage-vehicle.php");
+                exit(); // Ensure no further code is executed
+            } else {
+                echo "<div class='alert alert-danger' role='alert'>Error: " . $stmt->error . "</div>";
+            }
+
+            // Close the statement
+            $stmt->close();
+        } else {
+            echo "<div class='alert alert-danger' role='alert'>Error: " . $conn->error . "</div>";
         }
-
-        // Generate QR Code with the full URL
-        $qrCodeFile = $qrCodeDir . "/parking" . $parkingID . ".png";
-        QRcode::png($parkingLink, $qrCodeFile, QR_ECLEVEL_L, 5);
-
-        // Redirect to admin-generate-park.php with the last inserted parkingID
-        header("Location: admin-view-vehicle.php?parkingID=" . $parkingID);
-        exit(); // Ensure no further code is executed
-    } else {
-        echo "<div class='alert alert-danger' role='alert'>Error: " . $stmt->error . "</div>";
     }
-
-    // Close the statement
-    $stmt->close();
 }
 
 // Close the database connection
