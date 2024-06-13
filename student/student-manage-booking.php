@@ -58,6 +58,12 @@ if (isset($_GET['del_start'])) {
                         if (isset($deleteMessage)) {
                             echo $deleteMessage;
                         }
+
+                        // Display update message if set
+                        if (isset($_SESSION['updateMessage'])) {
+                            echo $_SESSION['updateMessage'];
+                            unset($_SESSION['updateMessage']);
+                        }
                         ?>
                         <div class="table-responsive">
                             <table class="table table-bordered table-hover table-striped" id="dataTable" width="100%" cellspacing="0">
@@ -82,17 +88,18 @@ if (isset($_GET['del_start'])) {
                                     ?>
                                         <tr>
                                             <td><?php echo $cnt; ?></td>
-                                            <td><?php echo $row->bookingID; ?></td>
-                                            <td><?php echo $row->bookingDate; ?></td>
-                                            <td><?php echo $row->bookingStart; ?></td>
-                                            <td><?php echo $row->bookingEnd; ?></td>
+                                            <td><?php echo htmlspecialchars($row->bookingID); ?></td>
+                                            <td><?php echo htmlspecialchars($row->bookingDate); ?></td>
+                                            <td><?php echo htmlspecialchars($row->bookingStart); ?></td>
+                                            <td><?php echo htmlspecialchars($row->bookingEnd); ?></td>
                                             <td>
-                                                <a href="student-view-booking.php?bookingID=<?php echo $row->bookingID;?>" class="badge bg-info text-white"><i class="fas fa-eye"></i> View</a>
-                                                <a href="student-manage-booking.php?del_start=<?php echo $row->bookingStart;?>" class="badge bg-danger text-white" onclick="return confirm('Are you sure you want to delete this booking?');"><i class="fas fa-trash-alt"></i> Delete</a>
+                                                <a href="student-view-booking.php?bookingID=<?php echo htmlspecialchars($row->bookingID); ?>" class="badge bg-info text-white"><i class="fas fa-eye"></i> View</a>
+                                                <a href="student-update-booking.php?bookingID=<?php echo htmlspecialchars($row->bookingID); ?>" class="badge bg-warning text-white"><i class="fas fa-edit"></i> Update</a>
+                                                <a href="student-manage-booking.php?del_start=<?php echo htmlspecialchars($row->bookingStart); ?>" class="badge bg-danger text-white" onclick="return confirm('Are you sure you want to delete this booking?');"><i class="fas fa-trash-alt"></i> Delete</a>
                                             </td>
                                         </tr>
                                     <?php
-                                        $cnt = $cnt + 1;
+                                        $cnt++;
                                     }
                                     ?>
                                 </tbody>
