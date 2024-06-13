@@ -49,6 +49,39 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirm_booking'])) {
             throw new Exception($stmt->error);
         }
 
+        // Insert into booking_history table
+        $studentNameQuery = "SELECT studentName FROM student WHERE studentID = ?";
+        $stmt = $conn->prepare($studentNameQuery);
+        $stmt->bind_param("s", $studentID);
+        $stmt->execute();
+        $studentNameResult = $stmt->get_result();
+        $studentNameRow = $studentNameResult->fetch_assoc();
+        $studentName = $studentNameRow['studentName'];
+
+        $parkingQuery = "SELECT parkingArea, parkingType FROM parkingspace WHERE parkingID = ?";
+        $stmt = $conn->prepare($parkingQuery);
+        $stmt->bind_param("s", $parkingID);
+        $stmt->execute();
+        $parkingResult = $stmt->get_result();
+        $parkingRow = $parkingResult->fetch_assoc();
+        $parkingArea = $parkingRow['parkingArea'];
+        $parkingType = $parkingRow['parkingType'];
+
+        $historyQuery = "INSERT INTO booking_history (bookingID, studentID, parkingID, bookingDate, bookingStart, bookingEnd, vehiclePlateNum, studentName, parkingArea, parkingType)
+                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $stmt = $conn->prepare($historyQuery);
+        $stmt->bind_param("ssssssssss", $bookingID, $studentID, $parkingID, $bookingDate, $bookingStart, $bookingEnd, $vehiclePlateNum, $studentName, $parkingArea, $parkingType);
+        if (!$stmt->execute()) {
+            throw new Exception($stmt->error);
+        }
+
+        // Update parking space status
+        $updateQuery = "UPDATE parkingspace SET parkingAvailabilityStatus = 'Occupied' WHERE parkingID = ?";
+        $stmt = $conn->prepare($updateQuery);
+        $stmt->bind_param("s", $parkingID);
+        if (!$stmt->execute()) {
+            throw new Exception($stmt->error);
+        }
 
         // Commit transaction
         $conn->commit();
