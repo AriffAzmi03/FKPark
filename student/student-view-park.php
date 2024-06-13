@@ -1,9 +1,21 @@
 <?php
+// Start the session
+session_start();
+
+// Check if the student is logged in
+if (!isset($_SESSION['studentID'])) {
+    header("Location: student-login.php");
+    exit();
+}
+
 // Include header file
 include('includes/header.php');
 
 // Include database connection file
 include('includes/dbconnection.php');
+
+// Get the student ID from the session
+$studentID = $_SESSION['studentID'];
 
 if (isset($_GET['parkingID'])) {
     $parkingID = $_GET['parkingID'];
@@ -33,8 +45,7 @@ if (isset($_GET['parkingID'])) {
         <div class='container mt-4'>
             <div class='card'>
                 <div class='card-header d-flex justify-content-between align-items-center'>
-                    <span>Newly Added Parking Space</span>
-                    <a href='admin-manage-area.php' class='btn btn-success'>Manage Parking</a>
+                    <span>Parking Space</span>
                 </div>
                 <div class='card-body'>
                     <div class='table-responsive'>
@@ -68,7 +79,7 @@ if (isset($_GET['parkingID'])) {
                         </table>
                     </div>
                     <div class='mt-3 text-left'>
-                        <a href='admin-create-park.php' class='btn btn-dark'>Add Parking</a>
+                       <a href='student-manage-area.php' class='btn btn-success'>Back</a>
                     </div>
                 </div>
             </div>

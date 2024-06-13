@@ -1,9 +1,21 @@
 <?php
+// Start the session
+session_start();
+
+// Check if the student is logged in
+if (!isset($_SESSION['studentID'])) {
+    header("Location: student-login.php");
+    exit();
+}
+
 // Include header file
 include('includes/header.php');
 
 // Include database connection file
 include('includes/dbconnection.php');
+
+// Get the student ID from the session
+$studentID = $_SESSION['studentID'];
 
 // Handle delete request
 if (isset($_GET['del'])) {
@@ -103,9 +115,7 @@ if (isset($_GET['search'])) {
                                             <td><?php echo htmlspecialchars($row->parkingAvailabilityStatus); ?></td>
                                             <td><?php echo htmlspecialchars(isset($row->parkingAddDetail) ? $row->parkingAddDetail : ''); ?></td>
                                             <td>
-                                                <a href="admin-edit-park.php?u_id=<?php echo $row->parkingID; ?>" class="badge bg-success text-white"><i class="fas fa-user-edit"></i> Update</a>
-                                                <a href="admin-manage-area.php?del=<?php echo $row->parkingID; ?>" class="badge bg-danger text-white" onclick="return confirm('Are you sure you want to delete this parking space?');"><i class="fas fa-trash-alt"></i> Delete</a>
-                                                <a href="admin-view-park.php?parkingID=<?php echo $row->parkingID; ?>" class="badge bg-info text-white"><i class="fas fa-eye"></i> View</a>
+                                                <a href="student-view-park.php?parkingID=<?php echo $row->parkingID; ?>" class="badge bg-info text-white"><i class="fas fa-eye"></i> View</a>
                                             </td>
                                         </tr>
                                     <?php

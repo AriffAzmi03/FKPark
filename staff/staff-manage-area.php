@@ -38,7 +38,7 @@ if (isset($_GET['search'])) {
                     <li class="breadcrumb-item">
                         <a href="#">Parking</a>
                     </li>
-                    <li class="breadcrumb-item active">Manage Parking Spaces</li>
+                    <li class="breadcrumb-item active">View Parking Spaces</li>
                 </ol>
             </div>
         </div>
@@ -103,9 +103,7 @@ if (isset($_GET['search'])) {
                                             <td><?php echo htmlspecialchars($row->parkingAvailabilityStatus); ?></td>
                                             <td><?php echo htmlspecialchars(isset($row->parkingAddDetail) ? $row->parkingAddDetail : ''); ?></td>
                                             <td>
-                                                <a href="admin-edit-park.php?u_id=<?php echo $row->parkingID; ?>" class="badge bg-success text-white"><i class="fas fa-user-edit"></i> Update</a>
-                                                <a href="admin-manage-area.php?del=<?php echo $row->parkingID; ?>" class="badge bg-danger text-white" onclick="return confirm('Are you sure you want to delete this parking space?');"><i class="fas fa-trash-alt"></i> Delete</a>
-                                                <a href="admin-view-park.php?parkingID=<?php echo $row->parkingID; ?>" class="badge bg-info text-white"><i class="fas fa-eye"></i> View</a>
+                                                <a href="staff-view-park.php?parkingID=<?php echo $row->parkingID; ?>" class="badge bg-info text-white"><i class="fas fa-eye"></i> View</a>
                                             </td>
                                         </tr>
                                     <?php

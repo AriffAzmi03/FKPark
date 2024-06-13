@@ -33,8 +33,7 @@ if (isset($_GET['parkingID'])) {
         <div class='container mt-4'>
             <div class='card'>
                 <div class='card-header d-flex justify-content-between align-items-center'>
-                    <span>Newly Added Parking Space</span>
-                    <a href='admin-manage-area.php' class='btn btn-success'>Manage Parking</a>
+                    <span>Parking Space</span>
                 </div>
                 <div class='card-body'>
                     <div class='table-responsive'>
@@ -68,7 +67,7 @@ if (isset($_GET['parkingID'])) {
                         </table>
                     </div>
                     <div class='mt-3 text-left'>
-                        <a href='admin-create-park.php' class='btn btn-dark'>Add Parking</a>
+                       <a href='staff-manage-area.php' class='btn btn-success'>Back</a>
                     </div>
                 </div>
             </div>
