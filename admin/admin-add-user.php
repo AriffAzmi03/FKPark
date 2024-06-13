@@ -17,21 +17,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_user'])) {
     $studentEmail = $_POST['studentEmail'];
     $studentPassword = $_POST['studentPassword']; // Store as plain text
 
-    // Prepare and execute the insert query
-    $query = "INSERT INTO student (studentName, studentID, studentPhoneNum, studentAddress, studentType, studentYear, studentEmail, studentPassword)
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("ssssssss", $studentName, $studentID, $studentPhoneNum, $studentAddress, $studentType, $studentYear, $studentEmail, $studentPassword);
+    // Check if studentID already exists
+    $checkQuery = "SELECT COUNT(*) FROM student WHERE studentID = ?";
+    $checkStmt = $conn->prepare($checkQuery);
+    $checkStmt->bind_param("s", $studentID);
+    $checkStmt->execute();
+    $checkStmt->bind_result($count);
+    $checkStmt->fetch();
+    $checkStmt->close();
 
-    // Check if the query executed successfully
-    if ($stmt->execute()) {
-        echo "<div class='alert alert-success' role='alert'>New user added successfully!</div>";
+    if ($count > 0) {
+        echo "<div class='alert alert-danger' role='alert'>Error: Student ID already exists.</div>";
     } else {
-        echo "<div class='alert alert-danger' role='alert'>Error: " . $stmt->error . "</div>";
-    }
+        // Prepare and execute the insert query
+        $query = "INSERT INTO student (studentName, studentID, studentPhoneNum, studentAddress, studentType, studentYear, studentEmail, studentPassword)
+                  VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("ssssssss", $studentName, $studentID, $studentPhoneNum, $studentAddress, $studentType, $studentYear, $studentEmail, $studentPassword);
 
-    // Close the statement
-    $stmt->close();
+        // Check if the query executed successfully
+        if ($stmt->execute()) {
+            echo "<div class='alert alert-success' role='alert'>New user added successfully!</div>";
+        } else {
+            echo "<div class='alert alert-danger' role='alert'>Error: " . $stmt->error . "</div>";
+        }
+
+        // Close the statement
+        $stmt->close();
+    }
 }
 
 // Close the database connection

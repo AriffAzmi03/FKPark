@@ -70,6 +70,11 @@ $result = $stmt->get_result();
                         if (isset($deleteMessage)) {
                             echo $deleteMessage;
                         }
+                        // Display success message if set
+                        if (isset($_SESSION['success_message'])) {
+                            echo "<div class='alert alert-success' role='alert'>" . $_SESSION['success_message'] . "</div>";
+                            unset($_SESSION['success_message']);
+                        }
                         ?>
                         <div class="table-responsive">
                             <table class="table table-bordered table-hover table-striped" width="100%" cellspacing="0">
@@ -95,12 +100,12 @@ $result = $stmt->get_result();
                                         echo "<td>" . $row['vehicleColour'] . "</td>";
                                         echo "<td>" . $row['vehiclePlateNum'] . "</td>";
                                         echo "<td>" . ucfirst($row['status']) . "</td>";
-                                        echo "<td>";
-                                        if (strtolower($row['status']) == 'approved') {
-                                            echo " | <a href='student-view-vehicle.php?plateNum=" . $row['vehiclePlateNum'] . "'><i class='fas fa-eye'></i> View</a>";
-                                            echo " | <a href='student-edit-vehicle.php?plateNum=" . $row['vehiclePlateNum'] . "'><i class='fas fa-edit'></i> Edit</a>";
+                                        echo "<td class='action-column'>";
+                                        if (strtolower($row['status']) != 'pending') {
+                                            echo "<a href='student-view-vehicle.php?plateNum=" . $row['vehiclePlateNum'] . "' class='btn btn-primary btn-sm mr-1 mb-1'><i class='fas fa-eye'></i> View</a>";
+                                            echo "<a href='student-edit-vehicle.php?plateNum=" . $row['vehiclePlateNum'] . "' class='btn btn-success btn-sm mr-1 mb-1'><i class='fas fa-edit'></i> Update</a>";
                                         }
-                                        echo "<a href='student-manage-vehicle.php?del=" . $row['vehiclePlateNum'] . "' onclick='return confirm(\"Are you sure you want to delete this vehicle?\");'><i class='fas fa-trash'></i> Delete</a>";
+                                        echo "<a href='student-manage-vehicle.php?del=" . $row['vehiclePlateNum'] . "' class='btn btn-danger btn-sm mb-1' onclick='return confirm(\"Are you sure you want to delete this vehicle?\");'><i class='fas fa-trash'></i> Delete</a>";
                                         echo "</td>";
                                         echo "</tr>";
                                         $cnt++;
@@ -122,3 +127,22 @@ $result = $stmt->get_result();
     ?>
 
 </div>
+
+<!-- Custom CSS for table and button spacing -->
+<style>
+.table th, .table td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.table-responsive {
+    margin-top: 15px;
+}
+
+.action-column {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+</style>

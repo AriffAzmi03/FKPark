@@ -21,7 +21,7 @@
                 </a>
                 <div class="collapse" id="collapseUser" aria-labelledby="headingUser" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" href="admin-manage-user.php">View User</a>
+                        <a class="nav-link" href="staff-view-user.php">View User</a>
                     </nav>
                 </div>
 
@@ -34,7 +34,7 @@
                 <div class="collapse" id="collapseVehicle" aria-labelledby="headingVehicle" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
                         <a class="nav-link" href="staff-approve-vehicle.php">Vehicle Approval</a>
-                        <a class="nav-link" href="staff-view-vehicle.php">Manage Vehicle</a>
+                        <a class="nav-link" href="staff-manage-vehicle.php">Manage Vehicle</a>
                     </nav>
                 </div>
 

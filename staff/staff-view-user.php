@@ -75,7 +75,6 @@ if (isset($_GET['search'])) {
                                         <th style="width: 20%;">Email</th>
                                         <th style="width: 15%;">Level Of Study</th>
                                         <th style="width: 10%;">Year Of Study</th>
-                                        <th style="width: 10%;">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -106,11 +105,6 @@ if (isset($_GET['search'])) {
                                             <td><?php echo $row->studentEmail; ?></td>
                                             <td><?php echo $row->studentType; ?></td>
                                             <td><?php echo $row->studentYear; ?></td>
-                                            <td class='action-column'>
-                                                <!-- Update and Delete buttons -->
-                                                <a href="admin-edit-user.php?u_id=<?php echo $row->studentID; ?>" class="btn btn-success btn-sm mr-1 mb-1"><i class="fas fa-user-edit"></i> Update</a>
-                                                <a href="admin-manage-user.php?del=<?php echo $row->studentID; ?>" class="btn btn-danger btn-sm mb-1" onclick="return confirm('Are you sure you want to delete this user?');"><i class="fas fa-trash-alt"></i> Delete</a>
-                                            </td>
                                         </tr>
                                     <?php
                                         $cnt++;
@@ -161,11 +155,6 @@ include('includes/scripts.php');
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-    }
-
-    .action-column {
-        display: flex;
-        gap: 2px; /* Reduced gap for action buttons */
     }
 
     .card-header .form-control, .card-header .btn {

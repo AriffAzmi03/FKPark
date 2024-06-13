@@ -9,8 +9,8 @@ include('includes/dbconnection.php');
 include('../phpqrcode/qrlib.php');
 
 // Retrieve vehicle details
-if (isset($_GET['vehiclePlateNum'])) {
-    $vehiclePlateNum = $_GET['vehiclePlateNum'];
+if (isset($_GET['plateNum'])) {
+    $vehiclePlateNum = $_GET['plateNum'];
 
     $query = "SELECT v.vehicleType, v.vehicleBrand, v.vehicleColour, v.vehiclePlateNum, v.vehicleGrant, v.status, s.studentName, s.studentID, s.studentPhoneNum, s.studentAddress, s.studentType, s.studentYear, s.studentEmail 
               FROM vehicle v 
@@ -43,58 +43,89 @@ if (isset($_GET['vehiclePlateNum'])) {
 ?>
 
 <div class="container mt-4">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item">
-            <a href="#">Vehicles</a>
-        </li>
-        <li class="breadcrumb-item active">View Vehicle</li>
-    </ol>
-    <hr>
-    <div class="row justify-content-center">
-        <div class="col-md-10">
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <span>Vehicle Information</span>
-                    <a href="admin-edit-vehicle.php?vehiclePlateNum=<?php echo $vehiclePlateNum; ?>" class="btn btn-success">Update Vehicle</a>
-                </div>
-                <div class="card-body">
-                    <?php if ($vehicle) { ?>
-                    <h5 class="card-title">Vehicle Details</h5>
-                    <p><strong>Vehicle Type:</strong> <?php echo htmlspecialchars($vehicle['vehicleType']); ?></p>
-                    <p><strong>Vehicle Brand:</strong> <?php echo htmlspecialchars($vehicle['vehicleBrand']); ?></p>
-                    <p><strong>Vehicle Colour:</strong> <?php echo htmlspecialchars($vehicle['vehicleColour']); ?></p>
-                    <p><strong>Vehicle Plate Number:</strong> <?php echo htmlspecialchars($vehicle['vehiclePlateNum']); ?></p>
-                    <p><strong>Status:</strong> <?php echo ucfirst(htmlspecialchars($vehicle['status'])); ?></p>
-                    <h5 class="card-title">Owner Details</h5>
-                    <p><strong>Student Name:</strong> <?php echo htmlspecialchars($vehicle['studentName']); ?></p>
-                    <p><strong>Student ID:</strong> <?php echo htmlspecialchars($vehicle['studentID']); ?></p>
-                    <p><strong>Phone Number:</strong> <?php echo htmlspecialchars($vehicle['studentPhoneNum']); ?></p>
-                    <p><strong>Address:</strong> <?php echo htmlspecialchars($vehicle['studentAddress']); ?></p>
-                    <p><strong>Level of Study:</strong> <?php echo htmlspecialchars($vehicle['studentType']); ?></p>
-                    <p><strong>Year of Study:</strong> <?php echo htmlspecialchars($vehicle['studentYear']); ?></p>
-                    <p><strong>Email:</strong> <?php echo htmlspecialchars($vehicle['studentEmail']); ?></p>
-                    <h5 class="card-title">Vehicle Grant</h5>
-                    <?php if ($vehicle['vehicleGrant']) { ?>
-                    <a href="view-grant.php?vehiclePlateNum=<?php echo $vehicle['vehiclePlateNum']; ?>" class="btn btn-primary btn-sm">View Grant</a>
-                    <?php } else { ?>
-                    <p>No grant uploaded for this vehicle.</p>
-                    <?php } ?>
-                    <h5 class="card-title">QR Code</h5>
-                    <img src="<?php echo $qrImagePath; ?>" alt="QR Code">
-                    <?php } else { ?>
-                    <div class="alert alert-info" role='alert'>Vehicle details not found.</div>
-                    <?php } ?>
-                </div>
-                <div class="card-footer small text-muted">
-                    <?php
-                    date_default_timezone_set("Asia/Kuala_Lumpur");
-                    echo "Generated : " . date("h:i:sa");
-                    ?>
-                </div>
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span>Vehicle Information</span>
+            <div>
+                <a href="admin-edit-vehicle.php?plateNum=<?php echo $vehiclePlateNum; ?>" class="btn btn-success">Update Vehicle</a>
+                <a href="admin-manage-vehicle.php" class="btn btn-secondary">Back</a>
             </div>
-            <div class="mt-3 text-left">
-                <a href="admin-manage-vehicle.php" class="btn btn-success">Back</a>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr>
+                            <th>Vehicle Type</th>
+                            <td><?php echo htmlspecialchars($vehicle['vehicleType']); ?></td>
+                        </tr>
+                        <tr>
+                            <th>Vehicle Brand</th>
+                            <td><?php echo htmlspecialchars($vehicle['vehicleBrand']); ?></td>
+                        </tr>
+                        <tr>
+                            <th>Vehicle Colour</th>
+                            <td><?php echo htmlspecialchars($vehicle['vehicleColour']); ?></td>
+                        </tr>
+                        <tr>
+                            <th>Vehicle Plate Number</th>
+                            <td><?php echo htmlspecialchars($vehicle['vehiclePlateNum']); ?></td>
+                        </tr>
+                        <tr>
+                            <th>Status</th>
+                            <td><?php echo ucfirst(htmlspecialchars($vehicle['status'])); ?></td>
+                        </tr>
+                        <tr>
+                            <th>Student Name</th>
+                            <td><?php echo htmlspecialchars($vehicle['studentName']); ?></td>
+                        </tr>
+                        <tr>
+                            <th>Student ID</th>
+                            <td><?php echo htmlspecialchars($vehicle['studentID']); ?></td>
+                        </tr>
+                        <tr>
+                            <th>Phone Number</th>
+                            <td><?php echo htmlspecialchars($vehicle['studentPhoneNum']); ?></td>
+                        </tr>
+                        <tr>
+                            <th>Address</th>
+                            <td><?php echo htmlspecialchars($vehicle['studentAddress']); ?></td>
+                        </tr>
+                        <tr>
+                            <th>Level of Study</th>
+                            <td><?php echo htmlspecialchars($vehicle['studentType']); ?></td>
+                        </tr>
+                        <tr>
+                            <th>Year of Study</th>
+                            <td><?php echo htmlspecialchars($vehicle['studentYear']); ?></td>
+                        </tr>
+                        <tr>
+                            <th>Email</th>
+                            <td><?php echo htmlspecialchars($vehicle['studentEmail']); ?></td>
+                        </tr>
+                        <tr>
+                            <th>Vehicle Grant</th>
+                            <td>
+                                <?php if ($vehicle['vehicleGrant']) { ?>
+                                    <a href="view-grant.php?vehiclePlateNum=<?php echo $vehicle['vehiclePlateNum']; ?>" class="btn btn-primary btn-sm">View Grant</a>
+                                <?php } else { ?>
+                                    <p>No grant uploaded for this vehicle.</p>
+                                <?php } ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>QR Code</th>
+                            <td><img src="<?php echo $qrImagePath; ?>" alt="QR Code"></td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
+        </div>
+        <div class="card-footer small text-muted">
+            <?php
+            date_default_timezone_set("Asia/Kuala_Lumpur");
+            echo "Generated : " . date("h:i:sa");
+            ?>
         </div>
     </div>
 </div>
