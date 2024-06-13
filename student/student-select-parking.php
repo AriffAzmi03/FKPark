@@ -1,19 +1,19 @@
 <?php
-session_start(); // Start the session
-ob_start(); // Start output buffering
-
-// Check if studentID session variable is not set
-if (!isset($_SESSION['studentID'])) {
-    // Redirect to the login page
-    header("Location: student-login.php");
-    exit(); // Terminate the script
-}
+session_start();
+// Enable output buffering
+ob_start();
 
 // Include header file
 include('includes/header.php');
 
 // Include database connection file
 include('includes/dbconnection.php');
+
+// Check if the student is logged in
+if (!isset($_SESSION['studentID'])) {
+    header("Location: student-login.php");
+    exit();
+}
 
 // Initialize variables
 $bookingDate = '';
@@ -61,6 +61,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <div class="form-group mb-3">
                                 <label for="bookingEnd">Time End</label>
                                 <input type="time" required class="form-control" id="bookingEnd" name="bookingEnd" value="<?php echo $bookingEnd; ?>">
+                            </div>
+                            <div class="form-group mb-3">
+                                <label for="vehiclePlateNum">Vehicle</label>
+                                <select required class="form-control" id="vehiclePlateNum" name="vehiclePlateNum">
+                                    <?php
+                                    $studentID = $_SESSION['studentID'];
+                                    $vehicleQuery = "SELECT vehiclePlateNum FROM vehicle WHERE studentID = ?";
+                                    $stmt = $conn->prepare($vehicleQuery);
+                                    $stmt->bind_param("s", $studentID);
+                                    $stmt->execute();
+                                    $vehicleResult = $stmt->get_result();
+                                    while ($vehicle = $vehicleResult->fetch_object()) {
+                                        echo "<option value='{$vehicle->vehiclePlateNum}'>{$vehicle->vehiclePlateNum}</option>";
+                                    }
+                                    ?>
+                                </select>
                             </div>
                             <button type="submit" class="btn btn-primary">Check Availability</button>
                         </form>
@@ -122,7 +138,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                             <td><?php echo $row->parkingArea; ?></td>
                                             <td><?php echo $row->parkingType; ?></td>
                                             <td>
-                                                <a href="student-add-booking.php?parkingID=<?php echo $row->parkingID; ?>&bookingDate=<?php echo $bookingDate; ?>&bookingStart=<?php echo $bookingStart; ?>&bookingEnd=<?php echo $bookingEnd; ?>" class="btn btn-primary">Select</a>
+                                                <a href="student-add-booking.php?parkingID=<?php echo $row->parkingID; ?>&bookingDate=<?php echo $bookingDate; ?>&bookingStart=<?php echo $bookingStart; ?>&bookingEnd=<?php echo $bookingEnd; ?>&vehiclePlateNum=<?php echo $_POST['vehiclePlateNum']; ?>" class="btn btn-primary">Select</a>
                                             </td>
                                         </tr>
                                     <?php
@@ -157,6 +173,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <?php
 // Include scripts
 include('includes/scripts.php');
+?>
 
-ob_end_flush(); // Flush the buffer and send output to the browser
+<!-- Custom CSS to ensure proper table layout -->
+<style>
+    .table-responsive table {
+        table-layout: auto; /* Adjusted to auto for better column width management */
+        width: 100%;
+    }
+    .table-responsive th, .table-responsive td {
+        word-wrap: break-word;
+    }
+    .table th, .table td {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>
+<?php
+// Flush the output buffer
+ob_end_flush();
 ?>

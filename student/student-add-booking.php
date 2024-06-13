@@ -1,24 +1,22 @@
 <?php
-session_start(); // Start the session
+session_start();
 ob_start(); // Start output buffering
 
-// Check if studentID session variable is not set
+// Check if the student is logged in
 if (!isset($_SESSION['studentID'])) {
-    // Redirect to the login page
     header("Location: student-login.php");
-    exit(); // Terminate the script
+    exit();
 }
 
 // Include header file
 include('includes/header.php');
-include('includes/sidebar.php'); // Include sidebar file
 
 // Include database connection file
 include('includes/dbconnection.php');
 
-// Function to generate a random booking ID (varchar 10)
+// Function to generate a random booking ID
 function generateRandomBookingID($length = 10) {
-    $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     $charactersLength = strlen($characters);
     $randomString = '';
     for ($i = 0; $i < $length; $i++) {
@@ -30,44 +28,41 @@ function generateRandomBookingID($length = 10) {
 // Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirm_booking'])) {
     // Get form data
+    $studentID = $_SESSION['studentID']; // Get studentID from session
     $parkingID = $_POST['parkingID'];
     $bookingDate = $_POST['bookingDate'];
     $bookingStart = $_POST['bookingStart'];
     $bookingEnd = $_POST['bookingEnd'];
-    $studentID = $_SESSION['studentID']; // Get the studentID from the session
-
-    // Generate random booking ID
-    $bookingID = generateRandomBookingID();
+    $vehiclePlateNum = $_POST['vehiclePlateNum'];
+    $bookingID = generateRandomBookingID(); // Generate random booking ID
 
     // Start a transaction
     $conn->begin_transaction();
 
     try {
         // Insert into booking table
-        $query = "INSERT INTO booking (bookingID, parkingID, bookingDate, bookingStart, bookingEnd, studentID)
-                  VALUES (?, ?, ?, ?, ?, ?)";
+        $query = "INSERT INTO booking (bookingID, studentID, parkingID, bookingDate, bookingStart, bookingEnd, vehiclePlateNum)
+                  VALUES (?, ?, ?, ?, ?, ?, ?)";
         $stmt = $conn->prepare($query);
-        $stmt->bind_param("ssssss", $bookingID, $parkingID, $bookingDate, $bookingStart, $bookingEnd, $studentID);
+        $stmt->bind_param("sssssss", $bookingID, $studentID, $parkingID, $bookingDate, $bookingStart, $bookingEnd, $vehiclePlateNum);
         if (!$stmt->execute()) {
             throw new Exception($stmt->error);
         }
 
-      
+
         // Commit transaction
         $conn->commit();
-        echo "<div class='alert alert-success' role='alert'>Parking space booked successfully!</div>";
+        // Close the statement
+        $stmt->close();
+        
+        // Redirect to manage booking page
+        header("Location: student-manage-booking.php");
+        exit();
     } catch (Exception $e) {
         // Rollback transaction if something went wrong
         $conn->rollback();
         echo "<div class='alert alert-danger' role='alert'>Error: " . $e->getMessage() . "</div>";
     }
-
-    // Close the statement
-    $stmt->close();
-    // Redirect to manage booking page
-    header("Location: student-manage-booking.php");
-    ob_end_flush(); // Flush the buffer and send output to the browser
-    exit(); // Terminate the script
 }
 
 // Get data from URL
@@ -75,6 +70,7 @@ $parkingID = $_GET['parkingID'];
 $bookingDate = $_GET['bookingDate'];
 $bookingStart = $_GET['bookingStart'];
 $bookingEnd = $_GET['bookingEnd'];
+$vehiclePlateNum = $_GET['vehiclePlateNum'];
 ?>
 
 <div class="container mt-4">
@@ -98,6 +94,7 @@ $bookingEnd = $_GET['bookingEnd'];
                         <input type="hidden" name="bookingDate" value="<?php echo $bookingDate; ?>">
                         <input type="hidden" name="bookingStart" value="<?php echo $bookingStart; ?>">
                         <input type="hidden" name="bookingEnd" value="<?php echo $bookingEnd; ?>">
+                        <input type="hidden" name="vehiclePlateNum" value="<?php echo $vehiclePlateNum; ?>">
                         
                         <div class="form-group mb-3">
                             <label for="parkingID">Parking Space ID</label>
@@ -115,6 +112,10 @@ $bookingEnd = $_GET['bookingEnd'];
                             <label for="bookingEnd">Time End</label>
                             <input type="text" class="form-control" id="bookingEnd" value="<?php echo $bookingEnd; ?>" disabled>
                         </div>
+                        <div class="form-group mb-3">
+                            <label for="vehiclePlateNum">Vehicle Plate Number</label>
+                            <input type="text" class="form-control" id="vehiclePlateNum" value="<?php echo $vehiclePlateNum; ?>" disabled>
+                        </div>
                         <button type="submit" name="confirm_booking" class="btn btn-success">Confirm Booking</button>
                     </form>
                 </div>
@@ -130,5 +131,5 @@ $bookingEnd = $_GET['bookingEnd'];
 include('includes/footer.php');
 include('includes/scripts.php');
 
-ob_end_flush(); // Flush the buffer and send output to the browser
+ob_end_flush(); // Flush the output buffer
 ?>
