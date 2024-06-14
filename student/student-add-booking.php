@@ -75,14 +75,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirm_booking'])) {
             throw new Exception($stmt->error);
         }
 
-        // Update parking space status
-        $updateQuery = "UPDATE parkingspace SET parkingAvailabilityStatus = 'Occupied' WHERE parkingID = ?";
-        $stmt = $conn->prepare($updateQuery);
-        $stmt->bind_param("s", $parkingID);
-        if (!$stmt->execute()) {
-            throw new Exception($stmt->error);
-        }
-
         // Commit transaction
         $conn->commit();
         // Close the statement
