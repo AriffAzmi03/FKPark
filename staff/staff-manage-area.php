@@ -102,8 +102,8 @@ if (isset($_GET['search'])) {
                                             <td><?php echo htmlspecialchars($row->parkingType); ?></td>
                                             <td><?php echo htmlspecialchars($row->parkingAvailabilityStatus); ?></td>
                                             <td><?php echo htmlspecialchars(isset($row->parkingAddDetail) ? $row->parkingAddDetail : ''); ?></td>
-                                            <td>
-                                                <a href="staff-view-park.php?parkingID=<?php echo $row->parkingID; ?>" class="badge bg-info text-white"><i class="fas fa-eye"></i> View</a>
+                                            <td class="action-column">
+                                                <a href="staff-view-park.php?parkingID=<?php echo $row->parkingID; ?>" class="btn btn-primary btn-sm mr-1 mb-1"><i class="fas fa-eye"></i> View</a>
                                             </td>
                                         </tr>
                                     <?php
@@ -152,5 +152,10 @@ include('includes/scripts.php');
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+    }
+    .action-column {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
     }
 </style>

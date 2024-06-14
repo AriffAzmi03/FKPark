@@ -67,8 +67,9 @@ $conn->close();
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header">
-                    Parking Space Update
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span>Parking Space Update</span>
+                    <a href="admin-manage-area.php" class="btn btn-secondary">Back</a>
                 </div>
                 <div class="card-body">
                     <!-- Update Parking Space Form -->
@@ -101,7 +102,6 @@ $conn->close();
                             </select>
                         </div>
                         <button type="submit" name="update_parking" class="btn btn-success">Update</button>
-                        <a href="admin-manage-area.php" class="btn btn-secondary">Back</a>
                     </form>
                     <!-- End Form -->
                 </div>

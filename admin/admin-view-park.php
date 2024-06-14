@@ -34,7 +34,10 @@ if (isset($_GET['parkingID'])) {
             <div class='card'>
                 <div class='card-header d-flex justify-content-between align-items-center'>
                     <span>Parking Space</span>
-                    <a href='admin-edit-park.php?u_id=" . $parkingID . "' class='btn btn-success'>Update Parking</a>
+                    <div>
+                        <a href='admin-edit-park.php?u_id=" . $parkingID . "' class='btn btn-success'>Update Parking</a>
+                        <a href='admin-manage-area.php' class='btn btn-secondary'>Back</a>
+                    </div>
                 </div>
                 <div class='card-body'>
                     <div class='table-responsive'>
@@ -66,9 +69,6 @@ if (isset($_GET['parkingID'])) {
                                 </tr>
                             </tbody>
                         </table>
-                    </div>
-                    <div class='mt-3 text-left'>
-                       <a href='admin-manage-area.php' class='btn btn-success'>Back</a>
                     </div>
                 </div>
             </div>

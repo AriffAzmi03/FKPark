@@ -115,7 +115,7 @@ if (isset($_GET['search'])) {
                                             <td><?php echo htmlspecialchars($row->parkingAvailabilityStatus); ?></td>
                                             <td><?php echo htmlspecialchars(isset($row->parkingAddDetail) ? $row->parkingAddDetail : ''); ?></td>
                                             <td>
-                                                <a href="student-view-park.php?parkingID=<?php echo $row->parkingID; ?>" class="badge bg-info text-white"><i class="fas fa-eye"></i> View</a>
+                                                <a href="student-view-park.php?parkingID=<?php echo $row->parkingID; ?>" class="btn btn-primary btn-sm text-white"><i class="fas fa-eye"></i> View</a>
                                             </td>
                                         </tr>
                                     <?php
