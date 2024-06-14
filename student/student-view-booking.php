@@ -15,8 +15,11 @@ if (!isset($_SESSION['studentID'])) {
 // Get booking ID from URL
 $bookingID = $_GET['bookingID'];
 
-// Fetch booking details
-$query = "SELECT * FROM booking WHERE bookingID = ?";
+// Fetch booking details including parkingArea and parkingID
+$query = "SELECT b.*, ps.parkingArea, ps.parkingID AS parkingSpaceID 
+          FROM booking b
+          INNER JOIN parkingspace ps ON b.parkingID = ps.parkingID
+          WHERE b.bookingID = ?";
 $stmt = $conn->prepare($query);
 $stmt->bind_param("s", $bookingID);
 $stmt->execute();
@@ -63,6 +66,14 @@ $stmt->close();
                         <div class="form-group mb-3">
                             <label for="vehiclePlateNum">Vehicle Plate Number</label>
                             <input type="text" class="form-control" id="vehiclePlateNum" value="<?php echo $booking->vehiclePlateNum; ?>" disabled>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="parkingArea">Parking Area</label>
+                            <input type="text" class="form-control" id="parkingArea" value="<?php echo $booking->parkingArea; ?>" disabled>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="parkingSpaceID">Parking Space ID</label>
+                            <input type="text" class="form-control" id="parkingSpaceID" value="<?php echo $booking->parkingSpaceID; ?>" disabled>
                         </div>
                         <a href="student-manage-booking.php" class="btn btn-primary">Back</a>
                     <?php } else { ?>

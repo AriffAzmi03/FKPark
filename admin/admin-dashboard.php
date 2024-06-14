@@ -39,9 +39,20 @@ $queryYearCounts = "SELECT studentYear, COUNT(*) as count FROM student GROUP BY 
 $resultYearCounts = $conn->query($queryYearCounts);
 $yearCounts = $resultYearCounts->fetch_all(MYSQLI_ASSOC);
 
+// Query to get the number of bookings per week for the last 10 weeks
+$queryBookingsPerWeek = "SELECT YEARWEEK(bookingDate) as yearWeek, COUNT(*) as count 
+                         FROM booking_history 
+                         GROUP BY YEARWEEK(bookingDate) 
+                         ORDER BY YEARWEEK(bookingDate) DESC 
+                         LIMIT 10";
+$resultBookingsPerWeek = $conn->query($queryBookingsPerWeek);
+$bookingsPerWeek = array_reverse($resultBookingsPerWeek->fetch_all(MYSQLI_ASSOC)); // Reverse to show oldest first
+
 // Convert PHP arrays to JavaScript
 $yearLabels = json_encode(array_column($yearCounts, 'studentYear'));
 $yearData = json_encode(array_column($yearCounts, 'count'));
+$weekLabels = json_encode(array_column($bookingsPerWeek, 'yearWeek'));
+$weekData = json_encode(array_column($bookingsPerWeek, 'count'));
 ?>
 
 <div class="container-fluid px-4">
@@ -53,7 +64,7 @@ $yearData = json_encode(array_column($yearCounts, 'count'));
 
     <div class="row">
         <!-- Registered Users Card -->
-        <div class="col-xl-6 col-md-6">
+        <div class="col-xl-4 col-md-6">
             <div class="card bg-primary text-white mb-4">
                 <div class="card-body">
                     <span class="card-title">Registered Students:</span>
@@ -68,7 +79,7 @@ $yearData = json_encode(array_column($yearCounts, 'count'));
             </div>
         </div>
         <!-- Registered Vehicles Card -->
-        <div class="col-xl-6 col-md-6">
+        <div class="col-xl-4 col-md-6">
             <div class="card bg-warning text-white mb-4">
                 <div class="card-body">
                     <span class="card-title">Registered Vehicles:</span>
@@ -82,7 +93,6 @@ $yearData = json_encode(array_column($yearCounts, 'count'));
                 </div>
             </div>
         </div>
-    </div>
 
     <div class="row">
         <!-- Bar Chart -->
@@ -106,6 +116,21 @@ $yearData = json_encode(array_column($yearCounts, 'count'));
                 </div>
                 <div class="card-body">
                     <canvas id="vehiclesChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Average Bookings Per Week Bar Chart -->
+        <div class="col-xl-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-chart-bar me-1"></i>
+                    Bookings Per Week
+                </div>
+                <div class="card-body">
+                    <canvas id="bookingsPerWeekChart" width="400" height="200"></canvas>
                 </div>
             </div>
         </div>
@@ -134,7 +159,11 @@ include('includes/scripts.php');
         }],
     };
 
-    // Bar chart configuration
+    // Data for the bookings per week bar chart
+    const weekLabels = <?php echo $weekLabels; ?>;
+    const weekData = <?php echo $weekData; ?>;
+
+    // Bar chart configuration for students per year
     var ctxBar = document.getElementById("studentsYearChart");
     var myBarChart = new Chart(ctxBar, {
         type: 'bar',
@@ -179,7 +208,7 @@ include('includes/scripts.php');
         }
     });
 
-    // Pie chart configuration
+    // Pie chart configuration for vehicles
     var ctxPie = document.getElementById("vehiclesChart");
     var myPieChart = new Chart(ctxPie, {
         type: 'pie',
@@ -194,6 +223,49 @@ include('includes/scripts.php');
                 display: true,
                 text: 'Registered Vehicles Breakdown'
             }
+        }
+    });
+
+    // Bar chart configuration for bookings per week
+    var ctxBookingsBar = document.getElementById("bookingsPerWeekChart");
+    var myBookingsBarChart = new Chart(ctxBookingsBar, {
+        type: 'bar',
+        data: {
+            labels: weekLabels,
+            datasets: [{
+                label: "Bookings per Week",
+                backgroundColor: "rgba(75, 192, 192, 0.2)",
+                borderColor: "rgba(75, 192, 192, 1)",
+                borderWidth: 1,
+                data: weekData,
+            }],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                xAxes: [{
+                    gridLines: {
+                        display: false
+                    },
+                    ticks: {
+                        maxTicksLimit: 10
+                    }
+                }],
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true,
+                        max: Math.max(...weekData) + 5, // Adjust max value dynamically
+                        maxTicksLimit: 5
+                    },
+                    gridLines: {
+                        display: true
+                    }
+                }],
+            },
+            legend: {
+                display: false
+            },
         }
     });
 </script>

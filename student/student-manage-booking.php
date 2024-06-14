@@ -6,6 +6,9 @@ include('includes/header.php');
 // Include database connection file
 include('includes/dbconnection.php');
 
+// Include QR code library
+include('../phpqrcode/qrlib.php');
+
 // Check if the student is logged in
 if (!isset($_SESSION['studentID'])) {
     header("Location: student-login.php");
@@ -27,6 +30,21 @@ if (isset($_GET['del_start'])) {
 
     // Close the statement
     $stmt->close();
+}
+
+// Generate QR code for each booking
+function generateQRCode($bookingID) {
+    $tempDir = '../qrcodes/';
+    if (!file_exists($tempDir)) {
+        mkdir($tempDir, 0777, true);
+    }
+    $codeContents = "http://localhost/FKPark/student/student-view-booking.php?bookingID=" . $bookingID;
+    $fileName = 'qrcode_' . $bookingID . '.png';
+    $pngAbsoluteFilePath = $tempDir . $fileName;
+    if (!file_exists($pngAbsoluteFilePath)) {
+        QRcode::png($codeContents, $pngAbsoluteFilePath, QR_ECLEVEL_L, 4);
+    }
+    return $pngAbsoluteFilePath;
 }
 ?>
 
@@ -58,16 +76,23 @@ if (isset($_GET['del_start'])) {
                         if (isset($deleteMessage)) {
                             echo $deleteMessage;
                         }
+
+                        // Display update message if set
+                        if (isset($_SESSION['updateMessage'])) {
+                            echo $_SESSION['updateMessage'];
+                            unset($_SESSION['updateMessage']);
+                        }
                         ?>
                         <div class="table-responsive">
                             <table class="table table-bordered table-hover table-striped" id="dataTable" width="100%" cellspacing="0">
                                 <thead>
                                     <tr>
                                         <th style="width: 5%;">#</th>
-                                        <th style="width: 20%;">Booking ID</th>
-                                        <th style="width: 20%;">Booking Date</th>
-                                        <th style="width: 20%;">Time Start</th>
-                                        <th style="width: 20%;">Time End</th>
+                                        <th style="width: 15%;">Booking ID</th>
+                                        <th style="width: 15%;">Booking Date</th>
+                                        <th style="width: 15%;">Time Start</th>
+                                        <th style="width: 15%;">Time End</th>
+                                        <th style="width: 20%;">QR Code</th>
                                         <th style="width: 15%;">Action</th>
                                     </tr>
                                 </thead>
@@ -79,20 +104,23 @@ if (isset($_GET['del_start'])) {
                                     $res = $stmt->get_result();
                                     $cnt = 1;
                                     while ($row = $res->fetch_object()) {
+                                        $qrCodePath = generateQRCode($row->bookingID);
                                     ?>
                                         <tr>
                                             <td><?php echo $cnt; ?></td>
-                                            <td><?php echo $row->bookingID; ?></td>
-                                            <td><?php echo $row->bookingDate; ?></td>
-                                            <td><?php echo $row->bookingStart; ?></td>
-                                            <td><?php echo $row->bookingEnd; ?></td>
+                                            <td><?php echo htmlspecialchars($row->bookingID); ?></td>
+                                            <td><?php echo htmlspecialchars($row->bookingDate); ?></td>
+                                            <td><?php echo htmlspecialchars($row->bookingStart); ?></td>
+                                            <td><?php echo htmlspecialchars($row->bookingEnd); ?></td>
+                                            <td><img src="<?php echo $qrCodePath; ?>" alt="QR Code" width="100" height="100"></td>
                                             <td>
-                                                <a href="student-view-booking.php?bookingID=<?php echo $row->bookingID;?>" class="badge bg-info text-white"><i class="fas fa-eye"></i> View</a>
-                                                <a href="student-manage-booking.php?del_start=<?php echo $row->bookingStart;?>" class="badge bg-danger text-white" onclick="return confirm('Are you sure you want to delete this booking?');"><i class="fas fa-trash-alt"></i> Delete</a>
+                                                <a href="student-view-booking.php?bookingID=<?php echo htmlspecialchars($row->bookingID); ?>" class="badge bg-info text-white"><i class="fas fa-eye"></i> View</a>
+                                                <a href="student-update-booking.php?bookingID=<?php echo htmlspecialchars($row->bookingID); ?>" class="badge bg-warning text-white"><i class="fas fa-edit"></i> Update</a>
+                                                <a href="student-manage-booking.php?del_start=<?php echo htmlspecialchars($row->bookingStart); ?>" class="badge bg-danger text-white" onclick="return confirm('Are you sure you want to delete this booking?');"><i class="fas fa-trash-alt"></i> Delete</a>
                                             </td>
                                         </tr>
                                     <?php
-                                        $cnt = $cnt + 1;
+                                        $cnt++;
                                     }
                                     ?>
                                 </tbody>
