@@ -1,6 +1,8 @@
 <?php
+
 // Include header file
 include('includes/header.php');
+
 // Include database connection file
 include('includes/dbconnection.php');
 
@@ -54,7 +56,7 @@ $yearData = json_encode(array_column($yearCounts, 'count'));
         <div class="col-xl-6 col-md-6">
             <div class="card bg-primary text-white mb-4">
                 <div class="card-body">
-                    <span class="card-title">Registered Users:</span>
+                    <span class="card-title">Registered Students:</span>
                     <span class="card-count"><?php echo $totalUsers; ?></span>
                 </div>
                 <div class="card-footer d-flex align-items-center justify-content-between">
@@ -88,7 +90,7 @@ $yearData = json_encode(array_column($yearCounts, 'count'));
             <div class="card mb-4">
                 <div class="card-header">
                     <i class="fas fa-chart-bar me-1"></i>
-                    Students Per Year Of Study
+                    Registered Students (Year of Study)
                 </div>
                 <div class="card-body">
                     <canvas id="studentsYearChart" width="400" height="200"></canvas>

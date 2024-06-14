@@ -101,11 +101,13 @@ $result = $stmt->get_result();
                                         echo "<td>" . $row['vehiclePlateNum'] . "</td>";
                                         echo "<td>" . ucfirst($row['status']) . "</td>";
                                         echo "<td class='action-column'>";
-                                        if (strtolower($row['status']) != 'pending') {
+                                        if (strtolower($row['status']) == 'pending' || strtolower($row['status']) == 'rejected') {
+                                            echo "<a href='student-manage-vehicle.php?del=" . $row['vehiclePlateNum'] . "' class='btn btn-danger btn-sm mb-1' onclick='return confirm(\"Are you sure you want to delete this vehicle?\");'><i class='fas fa-trash'></i> Delete</a>";
+                                        } else {
                                             echo "<a href='student-view-vehicle.php?plateNum=" . $row['vehiclePlateNum'] . "' class='btn btn-primary btn-sm mr-1 mb-1'><i class='fas fa-eye'></i> View</a>";
                                             echo "<a href='student-edit-vehicle.php?plateNum=" . $row['vehiclePlateNum'] . "' class='btn btn-success btn-sm mr-1 mb-1'><i class='fas fa-edit'></i> Update</a>";
+                                            echo "<a href='student-manage-vehicle.php?del=" . $row['vehiclePlateNum'] . "' class='btn btn-danger btn-sm mb-1' onclick='return confirm(\"Are you sure you want to delete this vehicle?\");'><i class='fas fa-trash'></i> Delete</a>";
                                         }
-                                        echo "<a href='student-manage-vehicle.php?del=" . $row['vehiclePlateNum'] . "' class='btn btn-danger btn-sm mb-1' onclick='return confirm(\"Are you sure you want to delete this vehicle?\");'><i class='fas fa-trash'></i> Delete</a>";
                                         echo "</td>";
                                         echo "</tr>";
                                         $cnt++;

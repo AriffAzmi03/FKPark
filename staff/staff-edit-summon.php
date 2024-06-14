@@ -10,9 +10,9 @@ if (isset($_GET['summonID'])) {
     $summonID = $_GET['summonID'];
 
     // Retrieve summon details
-    $query = "SELECT * FROM summon WHERE summonID = ?";
+    $query = "SELECT summonID, vehiclePlateNum, summonViolationType, summonDemerit, DATE(summonDate) as summonDate, TIME(summonDate) as summonTime FROM summon WHERE summonID = ?";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("s", $summonID);
+    $stmt->bind_param("i", $summonID);
     $stmt->execute();
     $result = $stmt->get_result();
     $summon = $result->fetch_assoc();
@@ -34,22 +34,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_summon'])) {
     $summonViolationType = $_POST['summonViolationType'];
     $summonDemerit = $_POST['summonDemerit'];
     $summonDate = $_POST['summonDate'];
+    $summonTime = $_POST['summonTime'];
+    $summonDateTime = $summonDate . ' ' . $summonTime;
 
     // Prepare and execute the update query
     $update_query = "UPDATE summon SET vehiclePlateNum = ?, summonViolationType = ?, summonDemerit = ?, summonDate = ? WHERE summonID = ?";
     $stmt = $conn->prepare($update_query);
-    $stmt->bind_param("sssss", $vehiclePlateNum, $summonViolationType, $summonDemerit, $summonDate, $summonID);
+    $stmt->bind_param("ssssi", $vehiclePlateNum, $summonViolationType, $summonDemerit, $summonDateTime, $summonID);
 
     if ($stmt->execute()) {
         echo "<div class='alert alert-success' role='alert'>Summon updated successfully!</div>";
         // Refresh summon details
-        $query = "SELECT * FROM summon WHERE summonID = ?";
+        $query = "SELECT summonID, vehiclePlateNum, summonViolationType, summonDemerit, DATE(summonDate) as summonDate, TIME(summonDate) as summonTime FROM summon WHERE summonID = ?";
         $stmt = $conn->prepare($query);
-        $stmt->bind_param("s", $summonID);
+        $stmt->bind_param("i", $summonID);
         $stmt->execute();
         $result = $stmt->get_result();
         $summon = $result->fetch_assoc();
-        $stmt->close();
     } else {
         echo "<div class='alert alert-danger' role='alert'>Error: " . $stmt->error . "</div>";
     }
@@ -70,15 +71,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_summon'])) {
     <div class="row justify-content-center">
         <div class="col-md-10">
             <div class="card">
-                <div class="card-header">
-                    Edit Summon
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span>Edit Summon</span>
+                    <a href="staff-manage-summon.php" class="btn btn-secondary">Back</a>
                 </div>
                 <div class="card-body">
                     <?php if ($summon) { ?>
                     <form method="POST">
                         <div class="form-group mb-3">
                             <label for="vehiclePlateNum">Vehicle Plate Number</label>
-                            <input type="text" required class="form-control" id="vehiclePlateNum" name="vehiclePlateNum" value="<?php echo $summon['vehiclePlateNum']; ?>">
+                            <input type="text" required class="form-control" id="vehiclePlateNum" name="vehiclePlateNum" value="<?php echo htmlspecialchars($summon['vehiclePlateNum']); ?>">
                         </div>
                         <div class="form-group mb-3">
                             <label for="summonViolationType">Violation Type</label>
@@ -90,11 +92,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_summon'])) {
                         </div>
                         <div class="form-group mb-3">
                             <label for="summonDemerit">Demerit Points</label>
-                            <input type="text" required class="form-control" id="summonDemerit" name="summonDemerit" value="<?php echo $summon['summonDemerit']; ?>">
+                            <input type="text" required class="form-control" id="summonDemerit" name="summonDemerit" value="<?php echo htmlspecialchars($summon['summonDemerit']); ?>" readonly>
                         </div>
                         <div class="form-group mb-3">
                             <label for="summonDate">Summon Date</label>
-                            <input type="date" required class="form-control" id="summonDate" name="summonDate" value="<?php echo $summon['summonDate']; ?>">
+                            <input type="date" required class="form-control" id="summonDate" name="summonDate" value="<?php echo htmlspecialchars($summon['summonDate']); ?>">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="summonTime">Summon Time</label>
+                            <input type="time" required class="form-control" id="summonTime" name="summonTime" value="<?php echo htmlspecialchars($summon['summonTime']); ?>">
                         </div>
                         <button type="submit" name="update_summon" class="btn btn-success">Update Summon</button>
                     </form>
@@ -112,3 +118,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_summon'])) {
 include('includes/footer.php');
 include('includes/scripts.php');
 ?>
+
+<script>
+document.getElementById('summonViolationType').addEventListener('change', function() {
+    var violationType = this.value;
+    var demeritPoints = 0;
+
+    if (violationType === 'Parking Violation') {
+        demeritPoints = 10;
+    } else if (violationType === 'Campus Traffic Regulations') {
+        demeritPoints = 15;
+    } else if (violationType === 'Accident Cause') {
+        demeritPoints = 20;
+    }
+
+    document.getElementById('summonDemerit').value = demeritPoints;
+});
+</script>

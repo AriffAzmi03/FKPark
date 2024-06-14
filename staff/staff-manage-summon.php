@@ -1,4 +1,7 @@
 <?php
+// Start the session
+session_start();
+
 // Include header file
 include('includes/header.php');
 
@@ -10,7 +13,7 @@ if (isset($_GET['del'])) {
     $summonID = $_GET['del'];
     $delQuery = "DELETE FROM summon WHERE summonID = ?";
     $stmt = $conn->prepare($delQuery);
-    $stmt->bind_param("s", $summonID);
+    $stmt->bind_param("i", $summonID);
 
     if ($stmt->execute()) {
         $deleteMessage = "<div class='alert alert-success' role='alert'>Summon deleted successfully!</div>";
@@ -22,9 +25,25 @@ if (isset($_GET['del'])) {
     $stmt->close();
 }
 
+// Handle search request
+$searchQuery = "";
+if (isset($_GET['search'])) {
+    $searchQuery = $_GET['search'];
+}
+
 // Retrieve all summons
-$query = "SELECT summonID, vehiclePlateNum, summonViolationType, summonDemerit, summonDate FROM summon";
-$result = $conn->query($query);
+$query = "SELECT summonID, vehiclePlateNum, summonViolationType, summonDemerit, DATE(summonDate) as summonDate, TIME(summonDate) as summonTime FROM summon";
+if (!empty($searchQuery)) {
+    $query .= " WHERE vehiclePlateNum LIKE ?";
+}
+
+$stmt = $conn->prepare($query);
+if (!empty($searchQuery)) {
+    $searchParam = "%" . $searchQuery . "%";
+    $stmt->bind_param("s", $searchParam);
+}
+$stmt->execute();
+$result = $stmt->get_result();
 ?>
 
 <div id="content-wrapper">
@@ -45,15 +64,23 @@ $result = $conn->query($query);
         <div class="row justify-content-center">
             <div class="col-md-12">
                 <div class="card mb-4">
-                    <div class="card-header">
-                        <i class="fas fa-car"></i>
-                        Registered Summons
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-car"></i> Registered Summons</span>
+                        <!-- Search Form -->
+                        <form class="form-inline d-flex" method="get" action="">
+                            <input class="form-control mr-2" type="search" placeholder="Search by Plate Number" aria-label="Search" name="search" value="<?php echo htmlspecialchars($searchQuery); ?>">
+                            <button class="btn btn-outline-success" type="submit">Search</button>
+                        </form>
                     </div>
                     <div class="card-body">
                         <?php
                         // Display delete message if set
                         if (isset($deleteMessage)) {
                             echo $deleteMessage;
+                        }
+                        // Display success message if set
+                        if (isset($_GET['success'])) {
+                            echo "<div class='alert alert-success' role='alert'>New summon added successfully!</div>";
                         }
                         ?>
                         <div class="table-responsive">
@@ -65,6 +92,7 @@ $result = $conn->query($query);
                                         <th>Violation Type</th>
                                         <th>Demerit Points</th>
                                         <th>Summon Date</th>
+                                        <th>Summon Time</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -79,10 +107,11 @@ $result = $conn->query($query);
                                         <td><?php echo $row['summonViolationType']; ?></td>
                                         <td><?php echo $row['summonDemerit']; ?></td>
                                         <td><?php echo $row['summonDate']; ?></td>
-                                        <td>
-                                            <a href="staff-view-summon.php?summonID=<?php echo $row['summonID']; ?>" class="badge bg-primary text-white">View</a>
-                                            <a href="staff-edit-summon.php?summonID=<?php echo $row['summonID']; ?>" class="badge bg-success text-white">Edit</a>
-                                            <a href="staff-manage-summon.php?del=<?php echo $row['summonID']; ?>" class="badge bg-danger text-white" onclick="return confirm('Are you sure you want to delete this summon?');">Delete</a>
+                                        <td><?php echo $row['summonTime']; ?></td>
+                                        <td class='action-column'>
+                                            <a href="staff-view-summon.php?summonID=<?php echo $row['summonID']; ?>" class="btn btn-primary btn-sm mr-1 mb-1"><i class="fas fa-eye"></i> View</a>
+                                            <a href="staff-edit-summon.php?summonID=<?php echo $row['summonID']; ?>" class="btn btn-success btn-sm mr-1 mb-1"><i class="fas fa-edit"></i> Edit</a>
+                                            <a href="staff-manage-summon.php?del=<?php echo $row['summonID']; ?>" class="btn btn-danger btn-sm mb-1" onclick="return confirm('Are you sure you want to delete this summon?');"><i class="fas fa-trash"></i> Delete</a>
                                         </td>
                                     </tr>
                                     <?php
@@ -130,5 +159,10 @@ include('includes/scripts.php');
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+.action-column {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
 }
 </style>

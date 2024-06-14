@@ -53,7 +53,7 @@
 
                 <!-- Booking -->
                 <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseBooking" aria-expanded="false" aria-controls="collapseBooking">
-                    <div class="sb-nav-link-icon"><i class="fa-solid fa-tags"></i></div>
+                    <div class="sb-nav-link-icon"><i class="fa-solid fa-bookmark"></i></i></div>
                     Booking
                     <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                 </a>
@@ -71,7 +71,7 @@
                 </a>
                 <div class="collapse" id="collapseSummon" aria-labelledby="headingSummon" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" href="admin-manage-summon.php">Manage Summon</a>
+                        <a class="nav-link" href="admin-manage-summon.php">List of Summon</a>
                     </nav>
                 </div>
 

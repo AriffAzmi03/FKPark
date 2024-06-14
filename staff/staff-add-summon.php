@@ -1,9 +1,15 @@
 <?php
+// Start output buffering at the beginning
+ob_start();
+
 // Include header file
 include('includes/header.php');
 
 // Include database connection file
 include('includes/dbconnection.php');
+
+// Include QR code library
+include('../phpqrcode/qrlib.php');
 
 // Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_summon'])) {
@@ -12,17 +18,38 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_summon'])) {
     $summonViolationType = $_POST['summonViolationType'];
     $summonDemerit = $_POST['summonDemerit'];
     $summonDate = $_POST['summonDate'];
+    $summonTime = $_POST['summonTime'];
+    $summonDateTime = $summonDate . ' ' . $summonTime;
 
     // Prepare and execute the insert query
     $query = "INSERT INTO summon (vehiclePlateNum, summonViolationType, summonDemerit, summonDate)
               VALUES (?, ?, ?, ?)";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("ssis", $vehiclePlateNum, $summonViolationType, $summonDemerit, $summonDate);
+    if ($stmt === false) {
+        echo "<div class='alert alert-danger' role='alert'>Prepare failed: " . htmlspecialchars($conn->error) . "</div>";
+        exit();
+    }
+    $stmt->bind_param("ssis", $vehiclePlateNum, $summonViolationType, $summonDemerit, $summonDateTime);
 
     if ($stmt->execute()) {
-        echo "<div class='alert alert-success' role='alert'>New summon added successfully!</div>";
+        // Prepare the URL for the QR code
+        $summonLink = "http://localhost/FKPark/staff/staff-view-summon.php?summonID=" . $stmt->insert_id;
+
+        // Create QR Code directory if it does not exist
+        $qrCodeDir = "../imageQR";
+        if (!is_dir($qrCodeDir)) {
+            mkdir($qrCodeDir, 0755, true);
+        }
+
+        // Generate QR Code with the full URL
+        $qrCodeFile = $qrCodeDir . "/summon" . $stmt->insert_id . ".png";
+        QRcode::png($summonLink, $qrCodeFile, QR_ECLEVEL_L, 5);
+
+        // Redirect to staff-manage-summon.php with a success message
+        header("Location: staff-manage-summon.php?success=1");
+        exit();
     } else {
-        echo "<div class='alert alert-danger' role='alert'>Error: " . $stmt->error . "</div>";
+        echo "<div class='alert alert-danger' role='alert'>Execute failed: " . htmlspecialchars($stmt->error) . "</div>";
     }
 
     // Close the statement
@@ -72,8 +99,12 @@ $conn->close();
                             <label for="summonDate">Summon Date</label>
                             <input type="date" required class="form-control" id="summonDate" name="summonDate">
                         </div>
-                        <button type="submit" name="add_summon" class="btn btn-success">Add Summon</button>
-                        <button type="reset" class="btn btn-secondary">Reset</button>
+                        <div class="form-group mb-3">
+                            <label for="summonTime">Summon Time</label>
+                            <input type="time" required class="form-control" id="summonTime" name="summonTime">
+                        </div>
+                        <button type="submit" name="add_summon" class="btn btn-primary">Add Summon</button>
+                        <button type="reset" class="btn btn-light">Reset</button>
                     </form>
                     <!-- End Form -->
                 </div>
@@ -88,6 +119,9 @@ $conn->close();
 // Include footer and scripts
 include('includes/footer.php');
 include('includes/scripts.php');
+
+// End output buffering and flush the output
+ob_end_flush();
 ?>
 
 <script>

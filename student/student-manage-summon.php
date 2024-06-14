@@ -30,18 +30,21 @@ $stmt->close();
 
 // Determine enforcement status based on total demerit points
 $enforcement_status = "";
-if ($total_demerit < 20) {
-    $enforcement_status = "Warning given";
-} elseif ($total_demerit < 50) {
-    $enforcement_status = "Revoke of in-campus vehicle permission for 1 semester";
-} elseif ($total_demerit < 80) {
-    $enforcement_status = "Revoke of in-campus vehicle permission for 2 semesters";
-} else {
-    $enforcement_status = "Revoke of in-campus vehicle permission for the entire study duration";
+if ($total_demerit > 0) {
+    if ($total_demerit < 20) {
+        $enforcement_status = "Warning given";
+    } elseif ($total_demerit < 50) {
+        $enforcement_status = "Revoke of in-campus vehicle permission for 1 semester";
+    } elseif ($total_demerit < 80) {
+        $enforcement_status = "Revoke of in-campus vehicle permission for 2 semesters";
+    } else {
+        $enforcement_status = "Revoke of in-campus vehicle permission for the entire study duration";
+    }
 }
 
 // Retrieve summons for the logged-in student
-$query = "SELECT s.summonID, s.vehiclePlateNum, s.summonViolationType, s.summonDemerit, s.summonDate 
+$query = "SELECT s.summonID, s.vehiclePlateNum, s.summonViolationType, s.summonDemerit, 
+                 DATE(s.summonDate) as summonDate, TIME(s.summonDate) as summonTime
           FROM summon s 
           JOIN vehicle v ON s.vehiclePlateNum = v.vehiclePlateNum
           WHERE v.studentID = ?";
@@ -66,6 +69,7 @@ $result = $stmt->get_result();
         </div>
 
         <!-- Demerit Points and Enforcement Status -->
+        <?php if ($total_demerit > 0) { ?>
         <div class="row justify-content-center">
             <div class="col-md-12">
                 <div class="card mb-4">
@@ -80,6 +84,7 @@ $result = $stmt->get_result();
                 </div>
             </div>
         </div>
+        <?php } ?>
 
         <!-- DataTables Example -->
         <div class="row justify-content-center">
@@ -99,6 +104,7 @@ $result = $stmt->get_result();
                                         <th>Violation Type</th>
                                         <th>Demerit Points</th>
                                         <th>Summon Date</th>
+                                        <th>Summon Time</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -113,8 +119,9 @@ $result = $stmt->get_result();
                                         <td><?php echo $row['summonViolationType']; ?></td>
                                         <td><?php echo $row['summonDemerit']; ?></td>
                                         <td><?php echo $row['summonDate']; ?></td>
+                                        <td><?php echo $row['summonTime']; ?></td>
                                         <td>
-                                            <a href="student-view-summon.php?summonID=<?php echo $row['summonID']; ?>" class="badge bg-primary text-white">View</a>
+                                            <a href="student-view-summon.php?summonID=<?php echo $row['summonID']; ?>" class="btn btn-primary btn-sm"><i class="fas fa-eye"></i> View</a>
                                         </td>
                                     </tr>
                                     <?php

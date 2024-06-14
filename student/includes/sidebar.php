@@ -21,7 +21,7 @@
                 </a>
                 <div class="collapse" id="collapseVehicle" aria-labelledby="headingVehicle" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" href="student-add-vehicle.php">Register Vehicle</a>
+                        <a class="nav-link" href="student-add-vehicle.php">Vehicle Registration</a>
                         <a class="nav-link" href="student-manage-vehicle.php">List of Vehicle</a>
                     </nav>
                 </div>
@@ -40,7 +40,7 @@
 
                 <!-- Booking -->
                 <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseBooking" aria-expanded="false" aria-controls="collapseBooking">
-                    <div class="sb-nav-link-icon"><i class="fa-solid fa-tags"></i></div>
+                    <div class="sb-nav-link-icon"><i class="fa-solid fa-bookmark"></i></i></div>
                     Booking
                     <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                 </a>

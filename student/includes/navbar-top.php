@@ -15,7 +15,6 @@
             <!-- Dropdown Menu -->
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                 <li><a class="dropdown-item" href="student-view-profile.php">User Profile</a></li>
-                <li><a class="dropdown-item" href="#!">Settings</a></li>
                 <li><hr class="dropdown-divider" /></li>
                 <li><a class="dropdown-item" href="student-login.php">Logout</a></li>
             </ul>

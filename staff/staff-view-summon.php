@@ -5,21 +5,41 @@ include('includes/header.php');
 // Include database connection file
 include('includes/dbconnection.php');
 
+// Include QR code library
+include('../phpqrcode/qrlib.php');
+
 // Retrieve summon details
 if (isset($_GET['summonID'])) {
     $summonID = $_GET['summonID'];
 
-    $query = "SELECT s.*, v.vehicleType, v.vehicleBrand, v.vehicleColour, v.vehiclePlateNum, st.studentName, st.studentID, st.studentPhoneNum, st.studentAddress, st.studentType, st.studentYear, st.studentEmail 
+    $query = "SELECT s.summonID, s.vehiclePlateNum, s.summonViolationType, s.summonDemerit, 
+                     DATE(s.summonDate) as summonDate, TIME(s.summonDate) as summonTime, 
+                     v.vehicleType, v.vehicleBrand, v.vehicleColour, 
+                     st.studentID, st.studentName, st.studentPhoneNum 
               FROM summon s 
-              JOIN vehicle v ON s.vehiclePlateNum = v.vehiclePlateNum
+              JOIN vehicle v ON s.vehiclePlateNum = v.vehiclePlateNum 
               JOIN student st ON v.studentID = st.studentID
               WHERE s.summonID = ?";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("s", $summonID);
+    $stmt->bind_param("i", $summonID);
     $stmt->execute();
     $result = $stmt->get_result();
     $summon = $result->fetch_assoc();
     $stmt->close();
+
+    if ($summon) {
+        // Generate QR code
+        $qrText = "Summon ID: " . $summon['summonID'] . "\nVehicle Plate Number: " . $summon['vehiclePlateNum'] . "\nViolation Type: " . $summon['summonViolationType'] . "\nDemerit Points: " . $summon['summonDemerit'] . "\nSummon Date: " . $summon['summonDate'] . "\nSummon Time: " . $summon['summonTime'] . "\nVehicle Type: " . $summon['vehicleType'] . "\nVehicle Brand: " . $summon['vehicleBrand'] . "\nVehicle Colour: " . $summon['vehicleColour'] . "\nStudent ID: " . $summon['studentID'] . "\nStudent Name: " . $summon['studentName'] . "\nStudent Phone Number: " . $summon['studentPhoneNum'];
+
+        // Set path for saving QR code image
+        $qrImagePath = '../imageQR/summon' . $summon['summonID'] . '.png';
+
+        // Generate QR code image
+        QRcode::png($qrText, $qrImagePath, QR_ECLEVEL_L, 4);
+    } else {
+        echo "<div class='alert alert-danger' role='alert'>Summon details not found.</div>";
+        exit();
+    }
 } else {
     echo "<div class='alert alert-danger' role='alert'>Invalid request.</div>";
     exit();
@@ -27,44 +47,79 @@ if (isset($_GET['summonID'])) {
 ?>
 
 <div class="container mt-4">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item">
-            <a href="#">Summons</a>
-        </li>
-        <li class="breadcrumb-item active">View Summon</li>
-    </ol>
-    <hr>
-    <div class="row justify-content-center">
-        <div class="col-md-10">
-            <div class="card">
-                <div class="card-header">
-                    Summon Information
-                </div>
-                <div class="card-body">
-                    <?php if ($summon) { ?>
-                    <h5 class="card-title">Summon Details</h5>
-                    <p><strong>Summon ID:</strong> <?php echo $summon['summonID']; ?></p>
-                    <p><strong>Violation Type:</strong> <?php echo $summon['summonViolationType']; ?></p>
-                    <p><strong>Demerit Points:</strong> <?php echo $summon['summonDemerit']; ?></p>
-                    <p><strong>Date:</strong> <?php echo $summon['summonDate']; ?></p>
-                    <h5 class="card-title">Vehicle Details</h5>
-                    <p><strong>Vehicle Type:</strong> <?php echo $summon['vehicleType']; ?></p>
-                    <p><strong>Vehicle Brand:</strong> <?php echo $summon['vehicleBrand']; ?></p>
-                    <p><strong>Vehicle Colour:</strong> <?php echo $summon['vehicleColour']; ?></p>
-                    <p><strong>Vehicle Plate Number:</strong> <?php echo $summon['vehiclePlateNum']; ?></p>
-                    <h5 class="card-title">Owner Details</h5>
-                    <p><strong>Student Name:</strong> <?php echo $summon['studentName']; ?></p>
-                    <p><strong>Student ID:</strong> <?php echo $summon['studentID']; ?></p>
-                    <p><strong>Phone Number:</strong> <?php echo $summon['studentPhoneNum']; ?></p>
-                    <p><strong>Address:</strong> <?php echo $summon['studentAddress']; ?></p>
-                    <p><strong>Level of Study:</strong> <?php echo $summon['studentType']; ?></p>
-                    <p><strong>Year of Study:</strong> <?php echo $summon['studentYear']; ?></p>
-                    <p><strong>Email:</strong> <?php echo $summon['studentEmail']; ?></p>
-                    <?php } else { ?>
-                    <div class="alert alert-info" role='alert'>Summon details not found.</div>
-                    <?php } ?>
-                </div>
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span>Summon Information</span>
+            <div>
+                <a href="staff-edit-summon.php?summonID=<?php echo $summonID; ?>" class="btn btn-success">Update Summon</a>
+                <a href="staff-manage-summon.php" class="btn btn-secondary">Back</a>
             </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr>
+                            <th>Summon ID</th>
+                            <td><?php echo htmlspecialchars($summon['summonID']); ?></td>
+                        </tr>
+                        <tr>
+                            <th>Vehicle Plate Number</th>
+                            <td><?php echo htmlspecialchars($summon['vehiclePlateNum']); ?></td>
+                        </tr>
+                        <tr>
+                            <th>Violation Type</th>
+                            <td><?php echo htmlspecialchars($summon['summonViolationType']); ?></td>
+                        </tr>
+                        <tr>
+                            <th>Demerit Points</th>
+                            <td><?php echo htmlspecialchars($summon['summonDemerit']); ?></td>
+                        </tr>
+                        <tr>
+                            <th>Summon Date</th>
+                            <td><?php echo htmlspecialchars($summon['summonDate']); ?></td>
+                        </tr>
+                        <tr>
+                            <th>Summon Time</th>
+                            <td><?php echo htmlspecialchars($summon['summonTime']); ?></td>
+                        </tr>
+                        <tr>
+                            <th>Vehicle Type</th>
+                            <td><?php echo htmlspecialchars($summon['vehicleType']); ?></td>
+                        </tr>
+                        <tr>
+                            <th>Vehicle Brand</th>
+                            <td><?php echo htmlspecialchars($summon['vehicleBrand']); ?></td>
+                        </tr>
+                        <tr>
+                            <th>Vehicle Colour</th>
+                            <td><?php echo htmlspecialchars($summon['vehicleColour']); ?></td>
+                        </tr>
+                        <tr>
+                            <th>Student ID</th>
+                            <td><?php echo htmlspecialchars($summon['studentID']); ?></td>
+                        </tr>
+                        <tr>
+                            <th>Student Name</th>
+                            <td><?php echo htmlspecialchars($summon['studentName']); ?></td>
+                        </tr>
+                        <tr>
+                            <th>Student Phone Number</th>
+                            <td><?php echo htmlspecialchars($summon['studentPhoneNum']); ?></td>
+                        </tr>
+                        <tr>
+                            <th>QR Code</th>
+                            <td><img src="<?php echo $qrImagePath; ?>" alt="QR Code"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer small text-muted">
+            <?php
+            date_default_timezone_set("Asia/Kuala_Lumpur");
+            echo "Generated : " . date("h:i:sa");
+            ?>
         </div>
     </div>
 </div>
