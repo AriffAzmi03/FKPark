@@ -15,12 +15,15 @@ if (!isset($_SESSION['studentID'])) {
     exit();
 }
 
+// Get the student ID from the session
+$studentID = $_SESSION['studentID'];
+
 // Handle delete request
 if (isset($_GET['del_start'])) {
     $bookingStart = $_GET['del_start'];
-    $delQuery = "DELETE FROM booking WHERE bookingStart = ?";
+    $delQuery = "DELETE FROM booking WHERE bookingStart = ? AND studentID = ?";
     $stmt = $conn->prepare($delQuery);
-    $stmt->bind_param("s", $bookingStart );
+    $stmt->bind_param("ss", $bookingStart, $studentID);
     
     if ($stmt->execute()) {
         $deleteMessage = "<div class='alert alert-success' role='alert'>Booking deleted successfully!</div>";
@@ -98,8 +101,9 @@ function generateQRCode($bookingID) {
                                 </thead>
                                 <tbody>
                                     <?php
-                                    $ret = "SELECT * FROM booking ORDER BY bookingDate DESC";
+                                    $ret = "SELECT * FROM booking WHERE studentID = ? ORDER BY bookingDate DESC";
                                     $stmt = $conn->prepare($ret);
+                                    $stmt->bind_param("s", $studentID);
                                     $stmt->execute();
                                     $res = $stmt->get_result();
                                     $cnt = 1;
@@ -114,9 +118,9 @@ function generateQRCode($bookingID) {
                                             <td><?php echo htmlspecialchars($row->bookingEnd); ?></td>
                                             <td><img src="<?php echo $qrCodePath; ?>" alt="QR Code" width="100" height="100"></td>
                                             <td>
-                                                <a href="student-view-booking.php?bookingID=<?php echo htmlspecialchars($row->bookingID); ?>" class="badge bg-info text-white"><i class="fas fa-eye"></i> View</a>
-                                                <a href="student-update-booking.php?bookingID=<?php echo htmlspecialchars($row->bookingID); ?>" class="badge bg-warning text-white"><i class="fas fa-edit"></i> Update</a>
-                                                <a href="student-manage-booking.php?del_start=<?php echo htmlspecialchars($row->bookingStart); ?>" class="badge bg-danger text-white" onclick="return confirm('Are you sure you want to delete this booking?');"><i class="fas fa-trash-alt"></i> Delete</a>
+                                                <a href="student-view-booking.php?bookingID=<?php echo htmlspecialchars($row->bookingID); ?>" class="btn btn-primary btn-sm"><i class="fas fa-eye"></i> View</a>
+                                                <a href="student-update-booking.php?bookingID=<?php echo htmlspecialchars($row->bookingID); ?>" class="btn btn-success btn-sm text-white"><i class="fas fa-edit"></i> Update</a>
+                                                <a href="student-manage-booking.php?del_start=<?php echo htmlspecialchars($row->bookingStart); ?>" class="btn btn-danger btn-sm text-white" onclick="return confirm('Are you sure you want to delete this booking?');"><i class="fas fa-trash-alt"></i> Delete</a>
                                             </td>
                                         </tr>
                                     <?php

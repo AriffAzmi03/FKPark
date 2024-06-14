@@ -1,5 +1,4 @@
 <?php
-session_start();
 // Include header file
 include('includes/header.php');
 
@@ -9,38 +8,37 @@ include('includes/dbconnection.php');
 // Include QR code library
 include('../phpqrcode/qrlib.php');
 
-// Check if the student is logged in
-if (!isset($_SESSION['studentID'])) {
-    header("Location: student-login.php");
-    exit();
-}
+// Retrieve booking details
+if (isset($_GET['bookingID'])) {
+    $bookingID = $_GET['bookingID'];
 
-// Get booking ID from URL
-$bookingID = $_GET['bookingID'];
+    // Fetch booking details including parkingArea and parkingID
+    $query = "SELECT b.*, ps.parkingArea, ps.parkingID AS parkingSpaceID 
+              FROM booking b
+              INNER JOIN parkingspace ps ON b.parkingID = ps.parkingID
+              WHERE b.bookingID = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("s", $bookingID);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $booking = $result->fetch_object();
+    $stmt->close();
 
-// Fetch booking details including parkingArea and parkingID
-$query = "SELECT b.*, ps.parkingArea, ps.parkingID AS parkingSpaceID 
-          FROM booking b
-          INNER JOIN parkingspace ps ON b.parkingID = ps.parkingID
-          WHERE b.bookingID = ?";
-$stmt = $conn->prepare($query);
-$stmt->bind_param("s", $bookingID);
-$stmt->execute();
-$result = $stmt->get_result();
-$booking = $result->fetch_object();
-$stmt->close();
+    if ($booking) {
+        // Generate QR code
+        $qrText = "Booking ID: " . $booking->bookingID . "\nBooking Date: " . $booking->bookingDate . "\nTime Start: " . $booking->bookingStart . "\nTime End: " . $booking->bookingEnd . "\nVehicle Plate Number: " . $booking->vehiclePlateNum . "\nParking Area: " . $booking->parkingArea . "\nParking Space ID: " . $booking->parkingSpaceID;
 
-if ($booking) {
-    // Generate QR code
-    $qrText = "Booking ID: " . $booking->bookingID . "\nBooking Date: " . $booking->bookingDate . "\nTime Start: " . $booking->bookingStart . "\nTime End: " . $booking->bookingEnd . "\nVehicle Plate Number: " . $booking->vehiclePlateNum . "\nParking Area: " . $booking->parkingArea . "\nParking Space ID: " . $booking->parkingSpaceID;
+        // Set path for saving QR code image
+        $qrImagePath = '../imageQR/booking' . $booking->bookingID . '.png';
 
-    // Set path for saving QR code image
-    $qrImagePath = '../imageQR/booking' . $booking->bookingID . '.png';
-
-    // Generate QR code image
-    QRcode::png($qrText, $qrImagePath, QR_ECLEVEL_L, 4);
+        // Generate QR code image
+        QRcode::png($qrText, $qrImagePath, QR_ECLEVEL_L, 4);
+    } else {
+        echo "<div class='alert alert-danger' role='alert'>No booking details found.</div>";
+        exit();
+    }
 } else {
-    echo "<div class='alert alert-danger' role='alert'>No booking details found.</div>";
+    echo "<div class='alert alert-danger' role='alert'>Invalid request.</div>";
     exit();
 }
 ?>
@@ -49,7 +47,9 @@ if ($booking) {
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <span>Booking Information</span>
-            <a href="student-manage-booking.php" class="btn btn-secondary">Back</a>
+            <div>
+                <a href="admin-manage-booking.php" class="btn btn-secondary">Back</a>
+            </div>
         </div>
         <div class="card-body">
             <div class="table-responsive">

@@ -59,7 +59,7 @@
                 </a>
                 <div class="collapse" id="collapseBooking" aria-labelledby="headingBooking" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" href="admin-report-booking.php">Report Booking</a>
+                        <a class="nav-link" href="admin-manage-booking.php">List of Booking</a>
                     </nav>
                 </div>
 

@@ -48,11 +48,44 @@ $queryBookingsPerWeek = "SELECT YEARWEEK(bookingDate) as yearWeek, COUNT(*) as c
 $resultBookingsPerWeek = $conn->query($queryBookingsPerWeek);
 $bookingsPerWeek = array_reverse($resultBookingsPerWeek->fetch_all(MYSQLI_ASSOC)); // Reverse to show oldest first
 
+// Fetch parking space data from the database
+$queryParking = "SELECT parkingAvailabilityStatus, COUNT(*) AS count FROM parkingspace GROUP BY parkingAvailabilityStatus";
+$resultParking = $conn->query($queryParking);
+
+$totalSpaces = 0;
+$availableSpaces = 0;
+$unavailableSpaces = 0;
+
+while ($row = $resultParking->fetch_assoc()) {
+    if ($row['parkingAvailabilityStatus'] == 'Available') {
+        $availableSpaces = $row['count'];
+    } else {
+        $unavailableSpaces = $row['count'];
+    }
+    $totalSpaces += $row['count'];
+}
+
+// Query to get the total number of bookings today, this week, and this month
+$queryBookingsToday = "SELECT COUNT(*) AS totalBookingsToday FROM booking WHERE DATE(bookingDate) = CURDATE()";
+$resultBookingsToday = $conn->query($queryBookingsToday);
+$totalBookingsToday = $resultBookingsToday->fetch_assoc()['totalBookingsToday'];
+
+$queryBookingsThisWeek = "SELECT COUNT(*) AS totalBookingsThisWeek FROM booking WHERE WEEK(bookingDate) = WEEK(CURDATE())";
+$resultBookingsThisWeek = $conn->query($queryBookingsThisWeek);
+$totalBookingsThisWeek = $resultBookingsThisWeek->fetch_assoc()['totalBookingsThisWeek'];
+
+$queryBookingsThisMonth = "SELECT COUNT(*) AS totalBookingsThisMonth FROM booking WHERE MONTH(bookingDate) = MONTH(CURDATE())";
+$resultBookingsThisMonth = $conn->query($queryBookingsThisMonth);
+$totalBookingsThisMonth = $resultBookingsThisMonth->fetch_assoc()['totalBookingsThisMonth'];
+
 // Convert PHP arrays to JavaScript
 $yearLabels = json_encode(array_column($yearCounts, 'studentYear'));
 $yearData = json_encode(array_column($yearCounts, 'count'));
 $weekLabels = json_encode(array_column($bookingsPerWeek, 'yearWeek'));
 $weekData = json_encode(array_column($bookingsPerWeek, 'count'));
+
+// Close the database connection
+$conn->close();
 ?>
 
 <div class="container-fluid px-4">
@@ -93,6 +126,42 @@ $weekData = json_encode(array_column($bookingsPerWeek, 'count'));
                 </div>
             </div>
         </div>
+        <!-- Parking Spaces Card -->
+        <div class="col-xl-4 col-md-6">
+            <div class="card bg-success text-white mb-4">
+                <div class="card-body">
+                    <span class="card-title">Parking Spaces:</span>
+                    <span class="card-count"><?php echo $totalSpaces; ?></span>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <span>Available: <?php echo $availableSpaces; ?></span>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <span>Unavailable: <?php echo $unavailableSpaces; ?></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Bookings Card -->
+        <div class="col-xl-4 col-md-6">
+            <div class="card bg-info text-white mb-4">
+                <div class="card-body">
+                    <span class="card-title">Today's Booking:</span>
+                    <span class="card-count"><?php echo $totalBookingsToday; ?></span>
+                </div>
+                <div class="card-body">
+                    <span class="card-title">Booking This Week:</span>
+                    <span class="card-count"><?php echo $totalBookingsThisWeek; ?></span>
+                </div>
+                <div class="card-body">
+                    <span class="card-title">Booking This Month:</span>
+                    <span class="card-count"><?php echo $totalBookingsThisMonth; ?></span>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="row">
         <!-- Bar Chart -->
@@ -122,8 +191,21 @@ $weekData = json_encode(array_column($bookingsPerWeek, 'count'));
     </div>
 
     <div class="row">
+        <!-- Parking Availability Pie Chart -->
+        <div class="col-xl-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-chart-pie me-1"></i>
+                    Parking Availability Status
+                </div>
+                <div class="card-body">
+                    <canvas id="parkingPieChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+
         <!-- Average Bookings Per Week Bar Chart -->
-        <div class="col-xl-12">
+        <div class="col-xl-6">
             <div class="card mb-4">
                 <div class="card-header">
                     <i class="fas fa-chart-bar me-1"></i>
@@ -266,6 +348,23 @@ include('includes/scripts.php');
             legend: {
                 display: false
             },
+        }
+    });
+
+    // Pie chart configuration for parking spaces
+    var ctxParkingPie = document.getElementById("parkingPieChart");
+    var myParkingPieChart = new Chart(ctxParkingPie, {
+        type: 'pie',
+        data: {
+            labels: ["Available", "Unavailable"],
+            datasets: [{
+                data: [<?php echo $availableSpaces; ?>, <?php echo $unavailableSpaces; ?>],
+                backgroundColor: ['#28a745', '#dc3545'],
+            }],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
         }
     });
 </script>

@@ -1,9 +1,27 @@
 <?php
+session_start();
 // Include header file
 include('includes/header.php');
 
 // Include database connection file
 include('includes/dbconnection.php');
+
+// Handle delete request
+if (isset($_GET['del_start'])) {
+    $bookingStart = $_GET['del_start'];
+    $delQuery = "DELETE FROM booking_history WHERE bookingStart = ?";
+    $stmt = $conn->prepare($delQuery);
+    $stmt->bind_param("s", $bookingStart);
+    
+    if ($stmt->execute()) {
+        $deleteMessage = "<div class='alert alert-success' role='alert'>Booking deleted successfully!</div>";
+    } else {
+        $deleteMessage = "<div class='alert alert-danger' role='alert'>Error: " . $stmt->error . "</div>";
+    }
+
+    // Close the statement
+    $stmt->close();
+}
 
 // Fetch booking history details
 $query = "SELECT * FROM booking_history ORDER BY bookingDate DESC";
@@ -23,14 +41,6 @@ while ($row = $result->fetch_assoc()) {
     $dates[$date]++;
 }
 
-$date_labels = [];
-$counts = [];
-
-foreach ($dates as $date => $count) {
-    $date_labels[] = $date;
-    $counts[] = $count;
-}
-
 // Note: Do not close the connection here as we need it later for fetching the booking details again.
 // $stmt->close();
 // $conn->close();
@@ -42,8 +52,8 @@ foreach ($dates as $date => $count) {
             <span>Booking Report</span>
         </div>
         <div class="card-body">
+            <?php if (isset($deleteMessage)) { echo $deleteMessage; } ?>
             <?php if (count($dates) > 0) { ?>
-                <canvas id="bookingBarChart"></canvas>
                 <div class="table-responsive mt-4">
                     <table class="table table-bordered table-hover table-striped" id="dataTable" width="100%" cellspacing="0">
                         <thead>
@@ -57,6 +67,7 @@ foreach ($dates as $date => $count) {
                                 <th>Parking Area</th>
                                 <th>Parking Type</th>
                                 <th>Vehicle Plate Number</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -78,6 +89,10 @@ foreach ($dates as $date => $count) {
                                     <td><?php echo htmlspecialchars($row->parkingArea); ?></td>
                                     <td><?php echo htmlspecialchars($row->parkingType); ?></td>
                                     <td><?php echo htmlspecialchars($row->vehiclePlateNum); ?></td>
+                                    <td>
+                                        <a href="admin-view-booking.php?bookingID=<?php echo htmlspecialchars($row->bookingID); ?>" class="btn btn-primary btn-sm"><i class="fas fa-eye"></i> View</a>
+                                        <a href="admin-manage-booking.php?del_start=<?php echo htmlspecialchars($row->bookingStart); ?>" class="btn btn-danger btn-sm text-white" onclick="return confirm('Are you sure you want to delete this booking?');"><i class="fas fa-trash-alt"></i> Delete</a>
+                                    </td>
                                 </tr>
                             <?php
                                 $cnt++;
@@ -105,35 +120,18 @@ include('includes/footer.php');
 include('includes/scripts.php');
 ?>
 
-<!-- Include Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<!-- Include Chart Bar Demo Script -->
-<script src="path/to/chart-bar-demo.js"></script>
-
-<script>
-    // Assuming chart-bar-demo.js initializes a chart with the ID 'myBarChart'
-    document.addEventListener('DOMContentLoaded', function() {
-        const ctx = document.getElementById('bookingBarChart').getContext('2d');
-        const bookingBarChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: <?php echo json_encode($date_labels); ?>,
-                datasets: [{
-                    label: 'Bookings per Date',
-                    data: <?php echo json_encode($counts); ?>,
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-    });
-</script>
+<!-- Custom CSS to ensure proper table layout -->
+<style>
+    .table-responsive table {
+        table-layout: auto; /* Adjusted to auto for better column width management */
+        width: 100%;
+    }
+    .table-responsive th, .table-responsive td {
+        word-wrap: break-word;
+    }
+    .table th, .table td {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>
