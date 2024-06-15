@@ -16,7 +16,7 @@
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                 <li><a class="dropdown-item" href="#!">User Profile</a></li>
                 <li><hr class="dropdown-divider" /></li>
-                <li><a class="dropdown-item" href="ukstaff-logout.php">Logout</a></li>
+                <li><a class="dropdown-item" href="staff-logout.php">Logout</a></li>
             </ul>
         </li>
     </ul>

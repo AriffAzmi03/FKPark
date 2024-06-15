@@ -114,7 +114,7 @@ if (isset($_POST['submit'])) {
                     <button type="submit" name="submit" class="btn btn-primary btn-block">Login</button>
                 </div>
                 <div class="form-group text-center">
-                    <a href="../admin/admin-login.php">Admin Login</a> | <a href="../ukstaff/ukstaff-login.php">Unit Keselamatan Staff Login</a>
+                    <a href="../admin/admin-login.php">Admin Login</a> | <a href="../staff/staff-login.php">Unit Keselamatan Staff Login</a>
                 </div>
             </form>
         </div>
