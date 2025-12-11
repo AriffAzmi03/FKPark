@@ -1,5 +1,5 @@
-<?php
-
+    <?php
+    
 // Include header file
 include('includes/header.php');
 
