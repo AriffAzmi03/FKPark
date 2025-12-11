@@ -11,90 +11,49 @@ include('includes/dbconnection.php');
 // Include QR code library
 include('../phpqrcode/qrlib.php');
 
-// Simple logger helper (optional)
-function app_log($msg) {
-    // file_put_contents(__DIR__ . '/error.log', date('[Y-m-d H:i:s] ') . $msg . PHP_EOL, FILE_APPEND);
-}
-
 // Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_summon'])) {
-    // Get and normalize form data
-    $vehiclePlateNum = strtoupper(trim($_POST['vehiclePlateNum'])); // normalize
-    $summonViolationType = trim($_POST['summonViolationType']);
-    $summonDemerit = (int)$_POST['summonDemerit'];
+    // Get form data
+    $vehiclePlateNum = $_POST['vehiclePlateNum'];
+    $summonViolationType = $_POST['summonViolationType'];
+    $summonDemerit = $_POST['summonDemerit'];
     $summonDate = $_POST['summonDate'];
     $summonTime = $_POST['summonTime'];
     $summonDateTime = $summonDate . ' ' . $summonTime;
 
-    // Basic server-side validation
-    if ($vehiclePlateNum === '' || $summonViolationType === '' || $summonDemerit <= 0) {
-        echo "<div class='alert alert-danger' role='alert'>Please fill all required fields correctly.</div>";
-    } else {
-        // 1) Check vehicle exists to avoid FK constraint error
-        $sqlCheck = "SELECT studentID FROM vehicle WHERE vehiclePlateNum = ? LIMIT 1";
-        $chkStmt = $conn->prepare($sqlCheck);
-        if ($chkStmt === false) {
-            echo "<div class='alert alert-danger' role='alert'>Database error: " . htmlspecialchars($conn->error) . "</div>";
-            exit();
-        }
-        $chkStmt->bind_param("s", $vehiclePlateNum);
-        $chkStmt->execute();
-        $res = $chkStmt->get_result();
-        $owner = $res->fetch_assoc();
-        $chkStmt->close();
-
-        if (!$owner) {
-            // Friendly message: vehicle not registered
-            echo "<div class='alert alert-warning' role='alert'>Vehicle <strong>" . htmlspecialchars($vehiclePlateNum) . "</strong> is not registered. Please register the vehicle first or use the unregistered-summon workflow.</div>";
-        } else {
-            // 2) Insert summon and update demerit inside a transaction
-            try {
-                $conn->begin_transaction();
-
-                // Insert summon
-                $query = "INSERT INTO summon (vehiclePlateNum, summonViolationType, summonDemerit, summonDate)
-                          VALUES (?, ?, ?, ?)";
-                $stmt = $conn->prepare($query);
-                if ($stmt === false) throw new Exception("Prepare insert failed: " . $conn->error);
-                $stmt->bind_param("ssis", $vehiclePlateNum, $summonViolationType, $summonDemerit, $summonDateTime);
-                if (!$stmt->execute()) throw new Exception("Execute insert failed: " . $stmt->error);
-                $summonID = $stmt->insert_id;
-                $stmt->close();
-
-                // Update student demerit_points (make sure student table has this column)
-                $studentID = $owner['studentID'];
-                $sqlUpdate = "UPDATE student SET demerit_points = COALESCE(demerit_points,0) + ? WHERE studentID = ?";
-                $st2 = $conn->prepare($sqlUpdate);
-                if ($st2 === false) throw new Exception("Prepare update failed: " . $conn->error);
-                $st2->bind_param("is", $summonDemerit, $studentID);
-                if (!$st2->execute()) throw new Exception("Execute update failed: " . $st2->error);
-                $st2->close();
-
-                // Generate QR after DB operations succeed
-                $summonLink = "http://localhost/FKPark/staff/staff-view-summon.php?summonID=" . $summonID;
-                $qrCodeDir = "../imageQR";
-                if (!is_dir($qrCodeDir)) {
-                    if (!mkdir($qrCodeDir, 0755, true)) {
-                        throw new Exception("Failed to create QR directory.");
-                    }
-                }
-                $qrCodeFile = $qrCodeDir . "/summon" . $summonID . ".png";
-                QRcode::png($summonLink, $qrCodeFile, QR_ECLEVEL_L, 5);
-
-                // Commit transaction
-                $conn->commit();
-
-                // Redirect with success
-                header("Location: staff-manage-summon.php?success=1");
-                exit();
-
-            } catch (Exception $e) {
-                if ($conn->in_transaction) $conn->rollback();
-                app_log($e->getMessage());
-                echo "<div class='alert alert-danger' role='alert'>Failed to save summon. Please try again or contact admin.</div>";
-            }
-        }
+    // Prepare and execute the insert query
+    $query = "INSERT INTO summon (vehiclePlateNum, summonViolationType, summonDemerit, summonDate)
+              VALUES (?, ?, ?, ?)";
+    $stmt = $conn->prepare($query);
+    if ($stmt === false) {
+        echo "<div class='alert alert-danger' role='alert'>Prepare failed: " . htmlspecialchars($conn->error) . "</div>";
+        exit();
     }
+    $stmt->bind_param("ssis", $vehiclePlateNum, $summonViolationType, $summonDemerit, $summonDateTime);
+
+    if ($stmt->execute()) {
+        // Prepare the URL for the QR code
+        $summonLink = "http://localhost/FKPark/staff/staff-view-summon.php?summonID=" . $stmt->insert_id;
+
+        // Create QR Code directory if it does not exist
+        $qrCodeDir = "../imageQR";
+        if (!is_dir($qrCodeDir)) {
+            mkdir($qrCodeDir, 0755, true);
+        }
+
+        // Generate QR Code with the full URL
+        $qrCodeFile = $qrCodeDir . "/summon" . $stmt->insert_id . ".png";
+        QRcode::png($summonLink, $qrCodeFile, QR_ECLEVEL_L, 5);
+
+        // Redirect to staff-manage-summon.php with a success message
+        header("Location: staff-manage-summon.php?success=1");
+        exit();
+    } else {
+        echo "<div class='alert alert-danger' role='alert'>Execute failed: " . htmlspecialchars($stmt->error) . "</div>";
+    }
+
+    // Close the statement
+    $stmt->close();
 }
 
 // Close the database connection
